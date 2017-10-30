@@ -14,8 +14,8 @@
 # Configuration Settings
 TARGET := agent.exe
 CXXFLAGS := -std=c++1y -Wall -Wextra -pedantic -Isrc
-LIBFLAGS := 
-SRCS := main.cpp
+LIBFLAGS := -lale
+SRCS := main.cpp image-processor.cpp screen.cpp game-entity.cpp
 DIRECTORIES := 
 
 
