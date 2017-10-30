@@ -14,4 +14,5 @@ using Grid = std::array<std::array<T, 8>, 8>;
 using StateType = std::pair<Grid<GameEntity>, Grid<Color>>;
 
 StateType getState(const Screen& screen);
+Color getGoal(const Screen& screen);
 }

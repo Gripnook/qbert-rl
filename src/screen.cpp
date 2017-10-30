@@ -8,9 +8,7 @@ Screen::Screen(const std::vector<unsigned char>& rgb, int width, int height)
     : w{width}, h{height}
 {
     if (static_cast<int>(rgb.size()) != 3 * w * h)
-    {
         throw std::runtime_error{"invalid screen RGB size"};
-    }
 
     for (int i = 0; i < h; ++i)
     {

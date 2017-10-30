@@ -15,7 +15,7 @@
 TARGET := agent.exe
 CXXFLAGS := -std=c++1y -Wall -Wextra -pedantic -Isrc
 LIBFLAGS := -lale
-SRCS := main.cpp image-processor.cpp screen.cpp game-entity.cpp
+SRCS := main.cpp image-processor.cpp screen.cpp game-entity.cpp agent.cpp learner.cpp state.cpp
 DIRECTORIES := 
 
 
