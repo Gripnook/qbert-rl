@@ -10,7 +10,8 @@ enum class GameEntity
     None,
     Qbert,
     PurpleEnemy,
-    GreenEnemy
+    GreenEnemy,
+    Disc
 };
 
 bool isDangerous(const GameEntity& entity);

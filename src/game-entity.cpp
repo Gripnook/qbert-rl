@@ -23,6 +23,8 @@ std::string toString(const GameEntity& entity)
         return "p";
     case GameEntity::GreenEnemy:
         return "g";
+    case GameEntity::Disc:
+        return "d";
     default:
         throw std::logic_error{"impossible"};
     }
