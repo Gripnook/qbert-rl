@@ -3,7 +3,10 @@
 #include <iomanip>
 
 #include <ale/ale_interface.hpp>
+
+#ifdef USE_SDL
 #include <SDL/SDL.h>
+#endif
 
 #include "image-processor.h"
 #include "screen.h"
@@ -24,28 +27,30 @@ int main(int argc, char** argv)
 
     ALEInterface ale;
     ale.setInt("random_seed", 123);
+#ifdef USE_SDL
     ale.setBool("display_screen", true);
     ale.setBool("sound", true);
+#endif
     ale.loadROM(argv[1]);
 
     Agent agent{ale};
 
-    std::ofstream os{"scores.csv"};
+    std::ofstream os{"results/scores.csv"};
     os << "Episode,Score" << std::endl;
-    std::vector<unsigned char> rgb;
+    // std::vector<unsigned char> rgb;
     int episode = 0;
     while (true)
     {
         ++episode;
         while (!ale.game_over())
         {
-            ale.getScreenRGB(rgb);
-            auto state =
-                getState(Screen{rgb,
-                                static_cast<int>(ale.getScreen().width()),
-                                static_cast<int>(ale.getScreen().height())});
-            std::cout << "High Score: " << agent.getHighScore() << std::endl;
-            print(state);
+            // ale.getScreenRGB(rgb);
+            // auto state =
+            //     getState(Screen{rgb,
+            //                     static_cast<int>(ale.getScreen().width()),
+            //                     static_cast<int>(ale.getScreen().height())});
+            // std::cout << "High Score: " << agent.getHighScore() << std::endl;
+            // print(state);
             agent.update();
         }
         os << episode << "," << agent.getScore() << std::endl;
