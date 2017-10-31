@@ -25,6 +25,7 @@ class Agent
     float highScore{0};
     Action action{Action::PLAYER_A_NOOP};
     std::pair<int, int> playerPosition{0, 0};
+    std::pair<int, int> positionTracker{0, 0};
 
 public:
     Agent(ALEInterface& ale);

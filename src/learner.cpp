@@ -8,21 +8,16 @@ namespace Qbert {
 
 // TODO
 static constexpr float alpha = 0.10;
-static constexpr float gamma = 0.95;
+static constexpr float gamma = 0.90;
 
-Action Learner::update(
+void Learner::update(
     std::pair<int, int> position,
     const StateType& state,
     float reward,
     Color goal)
 {
-    auto lastState = currentState;
+    lastState = currentState;
     currentState = encode(state, position.first, position.second, goal);
-    if (utilities.count(currentState) == 0)
-    {
-        utilities[currentState] = std::array<float, 4>{};
-        visited[currentState] = std::array<int, 4>{};
-    }
 
     if (lastState != -1)
     {
@@ -38,12 +33,24 @@ Action Learner::update(
             alpha * (reward + gamma * qMax - q);
     }
 
-    currentAction = getAction(position, state);
-    return currentAction;
+    lastAction = currentAction;
+    currentAction = tentativeAction;
+    ++visited[currentState][actionToIndex(currentAction)];
 }
 
-Action Learner::getAction(std::pair<int, int> position, const StateType& state)
+void Learner::correctUpdate(float reward)
 {
+    if (lastState != -1)
+    {
+        int actionIndex = actionToIndex(lastAction);
+        utilities[lastState][actionIndex] += alpha * reward;
+    }
+}
+
+Action Learner::getAction(
+    std::pair<int, int> position, const StateType& state, Color goal)
+{
+    auto currentState = encode(state, position.first, position.second, goal);
     auto actions = getActions(position, state);
 
     int minVisited = visited[currentState][actionToIndex(*std::min_element(
@@ -54,9 +61,8 @@ Action Learner::getAction(std::pair<int, int> position, const StateType& state)
 
     if (rand() % (minVisited + 1) == 0)
     {
-        auto action = actions[rand() % actions.size()];
-        ++visited[currentState][actionToIndex(action)];
-        return action;
+        tentativeAction = actions[rand() % actions.size()];
+        return tentativeAction;
     }
     else
     {
@@ -69,9 +75,8 @@ Action Learner::getAction(std::pair<int, int> position, const StateType& state)
         for (auto action : actions)
             if (utilities[currentState][actionToIndex(action)] == qMax)
                 bestActions.push_back(action);
-        auto action = bestActions[rand() % bestActions.size()];
-        ++visited[currentState][actionToIndex(action)];
-        return action;
+        tentativeAction = bestActions[rand() % bestActions.size()];
+        return tentativeAction;
     }
 }
 
@@ -100,5 +105,7 @@ void Learner::reset()
     currentState = -1;
     lastState = -1;
     currentAction = Action::PLAYER_A_NOOP;
+    lastAction = Action::PLAYER_A_NOOP;
+    tentativeAction = Action::PLAYER_A_NOOP;
 }
 }

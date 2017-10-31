@@ -74,6 +74,8 @@ std::unordered_map<Color, int> getColorCounts(
     int colBegin,
     int colEnd,
     Color background);
+std::unordered_map<Color, int> getColorCounts(
+    const Screen& screen, int rowBegin, int rowEnd, int colBegin, int colEnd);
 Color getMaxColor(const std::unordered_map<Color, int>& counts);
 
 StateType getState(const Screen& screen)
@@ -180,8 +182,6 @@ void addDiscs(Grid<GameEntity>& entities, const Screen& screen)
     int xScale = width / screen.width();
     int yScale = height / screen.height();
 
-    Color background = getBackground(screen);
-
     for (int i = 0; i < numDiscs; ++i)
     {
         int x0 = xDiscPositions[i] + xDiscStart;
@@ -189,15 +189,10 @@ void addDiscs(Grid<GameEntity>& entities, const Screen& screen)
         int y0 = yDiscPositions[i] + yDiscStart;
         int y1 = y0 + yDiscSize;
         auto counts = getColorCounts(
-            screen,
-            y0 / yScale,
-            y1 / yScale,
-            x0 / xScale,
-            x1 / xScale,
-            background);
+            screen, y0 / yScale, y1 / yScale, x0 / xScale, x1 / xScale);
 
-        // Discs have uniform coloring.
-        if (counts.size() == 1)
+        // Discs have uniform, non-black coloring.
+        if (counts.size() == 1 && counts.count(0) == 0)
             entities[discRows[i]][discCols[i]] = GameEntity::Disc;
     }
 }
@@ -252,6 +247,21 @@ std::unordered_map<Color, int> getColorCounts(
             Color color = screen.get(r, c);
             if (color != background && color != 0)
                 ++counts[color];
+        }
+    }
+    return counts;
+}
+
+std::unordered_map<Color, int> getColorCounts(
+    const Screen& screen, int rowBegin, int rowEnd, int colBegin, int colEnd)
+{
+    std::unordered_map<Color, int> counts;
+    for (int r = rowBegin; r < rowEnd; ++r)
+    {
+        for (int c = colBegin; c < colEnd; ++c)
+        {
+            Color color = screen.get(r, c);
+            ++counts[color];
         }
     }
     return counts;

@@ -19,6 +19,8 @@ void Agent::update()
     if (color != 0)
         goal = color;
 
+    update(getState(screen));
+
     float currentReward = ale.act(action);
     reward += currentReward;
     score += currentReward;
@@ -26,18 +28,28 @@ void Agent::update()
     if (ale.lives() < lives)
         reward -= 1000;
     lives = ale.lives();
-
-    update(getState(screen));
 }
 
 void Agent::update(const StateType& state)
 {
-    auto position = getPlayerPosition(state);
-    if (position != playerPosition)
+    action = Action::PLAYER_A_NOOP;
+    positionTracker = getPlayerPosition(state);
+
+    auto ram = ale.getRAM();
+    if (ram.get(0) == 0 && (ram.get(ram.size() - 1) & 0x01) == 1)
     {
-        playerPosition = position;
-        action = learner.update(playerPosition, state, reward, goal);
-        reward = 0;
+        action = learner.getAction(positionTracker, state, goal);
+        if (positionTracker != playerPosition)
+        {
+            playerPosition = positionTracker;
+            learner.update(playerPosition, state, reward, goal);
+            reward = 0;
+        }
+        else
+        {
+            learner.correctUpdate(reward);
+            reward = 0;
+        }
     }
 }
 
@@ -47,7 +59,7 @@ std::pair<int, int> Agent::getPlayerPosition(const StateType& state)
         for (int j = 0; j < 8; ++j)
             if (state.first[i][j] == GameEntity::Qbert)
                 return {i, j};
-    return playerPosition;
+    return positionTracker;
 }
 
 void Agent::resetGame()
@@ -59,6 +71,7 @@ void Agent::resetGame()
     score = 0;
     action = Action::PLAYER_A_NOOP;
     playerPosition = {0, 0};
+    positionTracker = {0, 0};
 }
 
 float Agent::getScore()
