@@ -51,8 +51,6 @@ void Learner::update(
     if (isRandomAction)
         ++randomActionCount;
     ++totalActionCount;
-
-    saveToFile();
 }
 
 void Learner::correctUpdate(float reward)
@@ -133,6 +131,8 @@ void Learner::reset()
     randomActionCount = 0;
     totalActionCount = 0;
     isRandomAction = true;
+
+    saveToFile();
 }
 
 float Learner::getRandomFraction()
