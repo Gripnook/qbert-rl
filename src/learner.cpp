@@ -1,5 +1,8 @@
 #include "learner.h"
 
+#include <fstream>
+#include <cstdio>
+
 #include "game-entity.h"
 #include "state.h"
 
@@ -8,6 +11,11 @@ namespace Qbert {
 // TODO
 static constexpr float alpha = 0.10;
 static constexpr float gamma = 0.90;
+
+Learner::Learner()
+{
+    loadFromFile();
+}
 
 void Learner::update(
     std::pair<int, int> position,
@@ -43,6 +51,8 @@ void Learner::update(
     if (isRandomAction)
         ++randomActionCount;
     ++totalActionCount;
+
+    saveToFile();
 }
 
 void Learner::correctUpdate(float reward)
@@ -128,5 +138,60 @@ void Learner::reset()
 float Learner::getRandomFraction()
 {
     return totalActionCount == 0 ? 0 : randomActionCount / totalActionCount;
+}
+
+void Learner::loadFromFile()
+{
+    std::ifstream is{"utilities.ai"};
+    if (!is)
+        return;
+    int size;
+    is >> size;
+    for (int i = 0; i < size; ++i)
+    {
+        int state;
+        is >> state;
+        std::array<float, 4> utility;
+        for (int j = 0; j < 4; ++j)
+            is >> utility[j];
+        utilities[state] = utility;
+    }
+    is >> size;
+    for (int i = 0; i < size; ++i)
+    {
+        int state;
+        is >> state;
+        std::array<int, 4> counts;
+        for (int j = 0; j < 4; ++j)
+            is >> counts[j];
+        visited[state] = counts;
+    }
+}
+
+void Learner::saveToFile()
+{
+    std::ofstream os{"temp-utilities.ai"};
+    os << utilities.size() << std::endl;
+    for (const auto& p : utilities)
+    {
+        os << p.first << " ";
+        for (const auto& utility : p.second)
+            os << utility << " ";
+        os << std::endl;
+    }
+    os << visited.size() << std::endl;
+    for (const auto& p : visited)
+    {
+        os << p.first << " ";
+        for (const auto& count : p.second)
+            os << count << " ";
+        os << std::endl;
+    }
+    commitFile();
+}
+
+void Learner::commitFile()
+{
+    rename("temp-utilities.ai", "utilities.ai");
 }
 }

@@ -24,6 +24,8 @@ class Learner
     bool isRandomAction{true};
 
 public:
+    Learner();
+
     void update(
         std::pair<int, int> position,
         const StateType& state,
@@ -46,5 +48,9 @@ private:
     std::vector<Action>
         getActions(std::pair<int, int> position, const StateType& state);
     static int actionToIndex(const Action& action);
+
+    void loadFromFile();
+    void saveToFile();
+    void commitFile();
 };
 }
