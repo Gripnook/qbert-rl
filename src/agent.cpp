@@ -11,12 +11,7 @@ Agent::Agent(ALEInterface& ale) : ale{ale}
 void Agent::update()
 {
     auto screen = ale.getScreen();
-
-    Color color = getGoal(screen);
-    if (color != 0)
-        goal = color;
-
-    update(getState(screen));
+    update(getState(screen), screen);
 
     float currentReward = ale.act(action);
     reward += currentReward;
@@ -27,7 +22,7 @@ void Agent::update()
     lives = ale.lives();
 }
 
-void Agent::update(const StateType& state)
+void Agent::update(const StateType& state, const ALEScreen& screen)
 {
     action = Action::PLAYER_A_NOOP;
     positionTracker = getPlayerPosition(state);
@@ -35,18 +30,56 @@ void Agent::update(const StateType& state)
     auto ram = ale.getRAM();
     if (ram.get(0) == 0 && (ram.get(ram.size() - 1) & 0x01) == 1)
     {
-        action = learner.getAction(positionTracker, state, goal);
-        if (positionTracker != playerPosition)
+        updateColors(state, screen, reward);
+        if (levelUp)
         {
-            playerPosition = positionTracker;
-            learner.update(playerPosition, state, reward, goal);
             reward = 0;
         }
         else
         {
-            learner.correctUpdate(reward);
-            reward = 0;
+            action = learner.getAction(positionTracker, state, goalColor);
+            if (positionTracker != playerPosition)
+            {
+                playerPosition = positionTracker;
+                learner.update(playerPosition, state, reward, goalColor);
+                reward = 0;
+            }
+            else
+            {
+                learner.correctUpdate(reward);
+                reward = 0;
+            }
         }
+    }
+}
+
+void Agent::updateColors(
+    const StateType& state, const ALEScreen& screen, float reward)
+{
+    if (levelUp && positionTracker == std::make_pair(1, 1))
+    {
+        startColor = state.second[1][1];
+        learner.correctUpdate(-3000);
+        levelUp = false;
+    }
+
+    Color color = getGoal(screen);
+    if (goalColor == 0 && color != 0)
+        goalColor = color;
+
+    if (reward == 100)
+    {
+        ++levelUpCounter;
+        if (levelUpCounter == 31)
+        {
+            levelUp = true;
+            startColor = 0;
+            goalColor = 0;
+        }
+    }
+    else
+    {
+        levelUpCounter = 0;
     }
 }
 
@@ -62,7 +95,10 @@ std::pair<int, int> Agent::getPlayerPosition(const StateType& state)
 void Agent::resetGame()
 {
     learner.reset();
-    goal = 0;
+    startColor = 0;
+    goalColor = 0;
+    levelUpCounter = 0;
+    levelUp = true;
     lives = 0;
     reward = 0;
     score = 0;

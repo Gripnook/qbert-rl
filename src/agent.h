@@ -15,7 +15,9 @@ class Agent
     ALEInterface& ale;
     Learner learner;
 
-    Color goal{0};
+    Color startColor{0}, goalColor{0};
+    int levelUpCounter{0};
+    bool levelUp{true};
 
     int lives{0};
     float reward{0};
@@ -35,7 +37,9 @@ public:
     float getHighScore();
 
 private:
-    void update(const StateType& state);
+    void update(const StateType& state, const ALEScreen& screen);
+    void updateColors(
+        const StateType& state, const ALEScreen& screen, float reward);
     std::pair<int, int> getPlayerPosition(const StateType& state);
 };
 }
