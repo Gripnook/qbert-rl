@@ -175,8 +175,8 @@ float Agent::getRandomFraction()
 void Agent::fixState(StateType& state)
 {
     auto ram = ale.getRAM();
-    int xCoily = ram.get(0xA7);
-    int yCoily = ram.get(0xC5);
+    int xCoily = ram.get(0x27);
+    int yCoily = ram.get(0x45);
     int x = (xCoily - yCoily + 5) / 2 + 1;
     int y = (xCoily + yCoily - 5) / 2 + 1;
     if (x >= 0 && x < 8 && y >= 0 && y < 8 && state.second[x][y] != 0)
