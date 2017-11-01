@@ -62,6 +62,7 @@ std::pair<std::vector<GameEntity>, std::vector<Color>>
 
 bool isOrange(const Color& color);
 bool isPurple(const Color& color);
+bool isRed(const Color& color);
 std::tuple<int, int, int> rgb(const Color& color);
 
 void addDiscs(Grid<GameEntity>& entities, const Screen& screen);
@@ -131,6 +132,8 @@ std::pair<std::vector<GameEntity>, std::vector<Color>>
             entities.push_back(GameEntity::Qbert);
         else if (isPurple(maxColor))
             entities.push_back(GameEntity::PurpleEnemy);
+        else if (isRed(maxColor))
+            entities.push_back(GameEntity::RedEnemy);
         else
             entities.push_back(GameEntity::GreenEnemy);
     }
@@ -159,7 +162,7 @@ bool isOrange(const Color& color)
 {
     int red, green, blue;
     std::tie(red, green, blue) = rgb(color);
-    return red >= 128 && green < 128 && blue < 128;
+    return red >= 128 && (green >= 64 && green < 128) && blue < 128;
 }
 
 bool isPurple(const Color& color)
@@ -167,6 +170,13 @@ bool isPurple(const Color& color)
     int red, green, blue;
     std::tie(red, green, blue) = rgb(color);
     return red >= 128 && green < 128 && blue >= 128;
+}
+
+bool isRed(const Color& color)
+{
+    int red, green, blue;
+    std::tie(red, green, blue) = rgb(color);
+    return red >= 128 && green < 64 && blue < 128;
 }
 
 std::tuple<int, int, int> rgb(const Color& color)

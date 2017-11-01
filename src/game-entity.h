@@ -10,10 +10,11 @@ enum class GameEntity
     None,
     Qbert,
     PurpleEnemy,
+    RedEnemy,
     GreenEnemy,
     Disc
 };
 
-bool isDangerous(const GameEntity& entity);
+bool isDangerousEnemy(const GameEntity& entity);
 std::string toString(const GameEntity& entity);
 }
