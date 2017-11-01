@@ -37,11 +37,13 @@ void Agent::update(const StateType& state, const ALEScreen& screen)
         }
         else
         {
-            action = learner.getAction(positionTracker, state, goalColor);
+            action = learner.getAction(
+                positionTracker, state, startColor, goalColor);
             if (positionTracker != playerPosition)
             {
                 playerPosition = positionTracker;
-                learner.update(playerPosition, state, reward, goalColor);
+                learner.update(
+                    playerPosition, state, reward, startColor, goalColor);
                 reward = 0;
             }
             else
@@ -63,7 +65,7 @@ void Agent::updateColors(
         levelUp = false;
     }
 
-    Color color = getGoal(screen);
+    Color color = getGoalColor(screen);
     if (goalColor == 0 && color != 0)
         goalColor = color;
 

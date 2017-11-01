@@ -24,11 +24,15 @@ public:
         std::pair<int, int> position,
         const StateType& state,
         float reward,
-        Color goal);
+        Color startColor,
+        Color goalColor);
     void correctUpdate(float reward);
 
     Action getAction(
-        std::pair<int, int> position, const StateType& state, Color goal);
+        std::pair<int, int> position,
+        const StateType& state,
+        Color startColor,
+        Color goalColor);
 
     void reset();
 

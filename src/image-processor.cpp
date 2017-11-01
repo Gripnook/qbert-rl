@@ -195,7 +195,7 @@ void addDiscs(Grid<GameEntity>& entities, const ALEScreen& screen)
     }
 }
 
-Color getGoal(const ALEScreen& screen)
+Color getGoalColor(const ALEScreen& screen)
 {
     int xScale = width / screen.width();
     int yScale = height / screen.height();

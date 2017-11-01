@@ -13,10 +13,12 @@ void Learner::update(
     std::pair<int, int> position,
     const StateType& state,
     float reward,
-    Color goal)
+    Color startColor,
+    Color goalColor)
 {
     lastState = currentState;
-    currentState = encode(state, position.first, position.second, goal);
+    currentState =
+        encode(state, position.first, position.second, startColor, goalColor);
 
     if (lastState != -1)
     {
@@ -47,9 +49,13 @@ void Learner::correctUpdate(float reward)
 }
 
 Action Learner::getAction(
-    std::pair<int, int> position, const StateType& state, Color goal)
+    std::pair<int, int> position,
+    const StateType& state,
+    Color startColor,
+    Color goalColor)
 {
-    auto currentState = encode(state, position.first, position.second, goal);
+    auto currentState =
+        encode(state, position.first, position.second, startColor, goalColor);
     auto actions = getActions(position, state);
 
     int minVisited = visited[currentState][actionToIndex(*std::min_element(
