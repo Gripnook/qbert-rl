@@ -4,9 +4,8 @@
 
 namespace Qbert {
 
-bool hasEnemiesNearby(const StateType& state, int x, int y);
-
 bool checkDangerousEnemy(const StateType& state, int x, int y);
+bool checkGreenEnemy(const StateType& state, int x, int y);
 bool checkDisc(const StateType& state, int x, int y);
 bool checkVoid(const StateType& state, int x, int y);
 
@@ -33,78 +32,106 @@ int countIntermediateColor(
     Color goalColor);
 bool checkColor(const StateType& state, int x, int y, Color color);
 
-int encode(
-    const StateType& state, int x, int y, Color startColor, Color goalColor)
+int countMoves(const StateType& state, int x, int y);
+
+int encodeBlockSolverState(
+    const StateType& state,
+    int x,
+    int y,
+    Color startColor,
+    Color goalColor,
+    int level)
 {
     int result = 0;
-    if (hasEnemiesNearby(state, x, y))
-    {
-        if (checkDangerousEnemy(state, x - 2, y))
-            result |= 1 << 1;
-        if (checkDangerousEnemy(state, x - 1, y - 1))
-            result |= 1 << 2;
-        if (checkDangerousEnemy(state, x - 1, y))
-            result |= 1 << 3;
-        if (checkDangerousEnemy(state, x - 1, y + 1))
-            result |= 1 << 4;
-        if (checkDangerousEnemy(state, x, y - 2))
-            result |= 1 << 5;
-        if (checkDangerousEnemy(state, x, y - 1))
-            result |= 1 << 6;
-        if (checkDangerousEnemy(state, x, y + 1))
-            result |= 1 << 7;
-        if (checkDangerousEnemy(state, x, y + 2))
-            result |= 1 << 8;
-        if (checkDangerousEnemy(state, x + 1, y - 1))
-            result |= 1 << 9;
-        if (checkDangerousEnemy(state, x + 1, y))
-            result |= 1 << 10;
-        if (checkDangerousEnemy(state, x + 1, y + 1))
-            result |= 1 << 11;
-        if (checkDangerousEnemy(state, x + 2, y))
-            result |= 1 << 12;
 
-        if (checkDisc(state, x - 2, y))
-            result |= 1 << 13;
-        if (checkDisc(state, x - 1, y - 1))
-            result |= 1 << 14;
-        if (checkDisc(state, x - 1, y))
-            result |= 1 << 15;
-        if (checkDisc(state, x - 1, y + 1))
-            result |= 1 << 16;
-        if (checkDisc(state, x, y - 2))
-            result |= 1 << 17;
-        if (checkDisc(state, x, y - 1))
-            result |= 1 << 18;
-        if (checkDisc(state, x + 1, y - 1))
-            result |= 1 << 19;
-    }
-    else
-    {
-        // We haven't yet found out the colors, so we return a special state.
-        if (startColor == 0 || goalColor == 0)
-            return 0;
+    // We haven't yet found out the colors, so we return a special state.
+    if (startColor == 0 || goalColor == 0)
+        return 0;
 
+    result |= 1 << 0;
+    result |= encodeColor(state, x, y, startColor, goalColor) << 1;
+    result |= encodeColor(state, x - 1, y, startColor, goalColor) << 3;
+    result |= encodeColor(state, x, y - 1, startColor, goalColor) << 5;
+    result |= encodeColor(state, x + 1, y, startColor, goalColor) << 7;
+    result |= encodeColor(state, x, y + 1, startColor, goalColor) << 9;
+    if (checkDisc(state, x - 1, y))
+        result |= encodeColor(state, 1, 1, startColor, goalColor) << 3;
+    if (checkDisc(state, x, y - 1))
+        result |= encodeColor(state, 1, 1, startColor, goalColor) << 5;
+
+    result |= encodeCount(state, 1, 6, 1, y - 1, startColor, goalColor) << 11;
+    result |= encodeCount(state, x + 1, 6, 1, 6, startColor, goalColor) << 14;
+    result |= encodeCount(state, 1, x - 1, 1, 6, startColor, goalColor) << 17;
+    result |= encodeCount(state, 1, 6, y + 1, 6, startColor, goalColor) << 20;
+
+    result |= std::min(level / 4, 4) << 23;
+
+    return result;
+}
+
+int encodeEnemyAvoiderState(
+    const StateType& state,
+    int x,
+    int y,
+    Color /*startColor*/,
+    Color /*goalColor*/,
+    int /*level*/)
+{
+    int result = 0;
+
+    if (checkDangerousEnemy(state, x - 2, y))
         result |= 1 << 0;
-        result |= encodeColor(state, x, y, startColor, goalColor) << 1;
-        result |= encodeColor(state, x - 1, y, startColor, goalColor) << 3;
-        result |= encodeColor(state, x, y - 1, startColor, goalColor) << 5;
-        result |= encodeColor(state, x + 1, y, startColor, goalColor) << 7;
-        result |= encodeColor(state, x, y + 1, startColor, goalColor) << 9;
-        if (checkDisc(state, x - 1, y))
-            result |= encodeColor(state, 1, 1, startColor, goalColor) << 3;
-        if (checkDisc(state, x, y - 1))
-            result |= encodeColor(state, 1, 1, startColor, goalColor) << 5;
+    if (checkDangerousEnemy(state, x - 1, y - 1))
+        result |= 1 << 1;
+    if (checkDangerousEnemy(state, x - 1, y))
+        result |= 1 << 2;
+    if (checkDangerousEnemy(state, x - 1, y + 1))
+        result |= 1 << 3;
+    if (checkDangerousEnemy(state, x, y - 2))
+        result |= 1 << 4;
+    if (checkDangerousEnemy(state, x, y - 1))
+        result |= 1 << 5;
+    if (checkDangerousEnemy(state, x, y + 1))
+        result |= 1 << 6;
+    if (checkDangerousEnemy(state, x, y + 2))
+        result |= 1 << 7;
+    if (checkDangerousEnemy(state, x + 1, y - 1))
+        result |= 1 << 8;
+    if (checkDangerousEnemy(state, x + 1, y))
+        result |= 1 << 9;
+    if (checkDangerousEnemy(state, x + 1, y + 1))
+        result |= 1 << 10;
+    if (checkDangerousEnemy(state, x + 2, y))
+        result |= 1 << 11;
 
-        result |= encodeCount(state, 1, 6, 1, y - 1, startColor, goalColor)
-            << 11;
-        result |= encodeCount(state, x + 1, 6, 1, 6, startColor, goalColor)
-            << 14;
-        result |= encodeCount(state, 1, x - 1, 1, 6, startColor, goalColor)
-            << 17;
-        result |= encodeCount(state, 1, 6, y + 1, 6, startColor, goalColor)
-            << 20;
-    }
+    if (checkGreenEnemy(state, x - 1, y))
+        result |= 1 << 12;
+    if (checkGreenEnemy(state, x, y - 1))
+        result |= 1 << 13;
+    if (checkGreenEnemy(state, x + 1, y))
+        result |= 1 << 14;
+    if (checkGreenEnemy(state, x, y + 1))
+        result |= 1 << 15;
+
+    if (checkDisc(state, x - 2, y))
+        result |= 1 << 16;
+    if (checkDisc(state, x - 1, y - 1))
+        result |= 1 << 17;
+    if (checkDisc(state, x - 1, y))
+        result |= 1 << 18;
+    if (checkDisc(state, x - 1, y + 1))
+        result |= 1 << 19;
+    if (checkDisc(state, x, y - 2))
+        result |= 1 << 20;
+    if (checkDisc(state, x, y - 1))
+        result |= 1 << 21;
+    if (checkDisc(state, x + 1, y - 1))
+        result |= 1 << 22;
+
+    result |= countMoves(state, x, y) << 23;
+    result |= ((x + 1) >> 1) << 27;
+    result |= ((y + 1) >> 1) << 29;
+
     return result;
 }
 
@@ -121,7 +148,9 @@ bool hasEnemiesNearby(const StateType& state, int x, int y)
         checkDangerousEnemy(state, x + 1, y - 1) ||
         checkDangerousEnemy(state, x + 1, y) ||
         checkDangerousEnemy(state, x + 1, y + 1) ||
-        checkDangerousEnemy(state, x + 2, y);
+        checkDangerousEnemy(state, x + 2, y) ||
+        checkGreenEnemy(state, x - 1, y) || checkGreenEnemy(state, x, y - 1) ||
+        checkGreenEnemy(state, x + 1, y) || checkGreenEnemy(state, x, y + 1);
 }
 
 bool checkDangerousEnemy(const StateType& state, int x, int y)
@@ -129,6 +158,13 @@ bool checkDangerousEnemy(const StateType& state, int x, int y)
     if (x < 0 || x >= 8 || y < 0 || y >= 8)
         return false;
     return isDangerousEnemy(state.first[x][y]);
+}
+
+bool checkGreenEnemy(const StateType& state, int x, int y)
+{
+    if (x < 0 || x >= 8 || y < 0 || y >= 8)
+        return false;
+    return state.first[x][y] == GameEntity::GreenEnemy;
 }
 
 bool checkDisc(const StateType& state, int x, int y)
@@ -204,7 +240,7 @@ int countIntermediateColor(
     int count = 0;
     for (int x = x0; x <= x1; ++x)
         for (int y = y0; y <= y1; ++y)
-            if (!checkColor(state, x, y, 0) &&
+            if (!checkVoid(state, x, y) && !checkColor(state, x, y, 0) &&
                 !checkColor(state, x, y, startColor) &&
                 !checkColor(state, x, y, goalColor))
                 ++count;
@@ -216,5 +252,19 @@ bool checkColor(const StateType& state, int x, int y, Color color)
     if (x < 0 || x >= 8 || y < 0 || y >= 8)
         return false;
     return state.second[x][y] == color;
+}
+
+int countMoves(const StateType& state, int x, int y)
+{
+    int result = 0;
+    if (!checkVoid(state, x - 1, y))
+        result |= 1 << 0;
+    if (!checkVoid(state, x, y - 1))
+        result |= 1 << 1;
+    if (!checkVoid(state, x + 1, y))
+        result |= 1 << 2;
+    if (!checkVoid(state, x, y + 1))
+        result |= 1 << 3;
+    return result;
 }
 }

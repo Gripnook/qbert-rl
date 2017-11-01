@@ -1,5 +1,7 @@
 #include "agent.h"
 
+#include <cmath>
+
 #include "game-entity.h"
 
 namespace Qbert {
@@ -37,18 +39,16 @@ void Agent::update(const StateType& state, const ALEScreen& screen)
         }
         else
         {
-            action = learner.getAction(
-                positionTracker, state, startColor, goalColor);
+            action = getAction(state);
             if (positionTracker != playerPosition)
             {
                 playerPosition = positionTracker;
-                learner.update(
-                    playerPosition, state, reward, startColor, goalColor);
+                update(state, reward);
                 reward = 0;
             }
             else
             {
-                learner.correctUpdate(reward);
+                correctUpdate(reward);
                 reward = 0;
             }
         }
@@ -61,8 +61,10 @@ void Agent::updateColors(
     if (levelUp && positionTracker == std::make_pair(1, 1))
     {
         startColor = state.second[1][1];
-        learner.correctUpdate(-3000);
+        for (int i = 0; i < 30; ++i)
+            correctUpdate(-100);
         levelUp = false;
+        ++level;
     }
 
     Color color = getGoalColor(screen);
@@ -85,6 +87,44 @@ void Agent::updateColors(
     }
 }
 
+void Agent::update(const StateType& state, float reward)
+{
+    float blockReward = fmod((fmod(reward, 100) + 100), 100);
+    blockSolver.update(
+        playerPosition,
+        state,
+        action,
+        blockReward,
+        startColor,
+        goalColor,
+        level);
+    enemyAvoider.update(
+        playerPosition,
+        state,
+        action,
+        reward - blockReward,
+        startColor,
+        goalColor,
+        level);
+}
+
+void Agent::correctUpdate(float reward)
+{
+    float blockReward = fmod((fmod(reward, 100) + 100), 100);
+    blockSolver.correctUpdate(blockReward);
+    enemyAvoider.correctUpdate(reward - blockReward);
+}
+
+Action Agent::getAction(const StateType& state)
+{
+    if (hasEnemiesNearby(state, positionTracker.first, positionTracker.second))
+        return enemyAvoider.getAction(
+            positionTracker, state, startColor, goalColor, level);
+    else
+        return blockSolver.getAction(
+            positionTracker, state, startColor, goalColor, level);
+}
+
 std::pair<int, int> Agent::getPlayerPosition(const StateType& state)
 {
     for (int i = 0; i < 8; ++i)
@@ -96,11 +136,13 @@ std::pair<int, int> Agent::getPlayerPosition(const StateType& state)
 
 void Agent::resetGame()
 {
-    learner.reset();
+    blockSolver.reset();
+    enemyAvoider.reset();
     startColor = 0;
     goalColor = 0;
     levelUpCounter = 0;
     levelUp = true;
+    level = -1;
     lives = 0;
     reward = 0;
     score = 0;
@@ -121,6 +163,10 @@ float Agent::getHighScore()
 
 float Agent::getRandomFraction()
 {
-    return learner.getRandomFraction();
+    float randomActionCount = blockSolver.getRandomActionCount() +
+        enemyAvoider.getRandomActionCount();
+    float totalActionCount =
+        blockSolver.getTotalActionCount() + enemyAvoider.getTotalActionCount();
+    return totalActionCount == 0 ? 0 : randomActionCount / totalActionCount;
 }
 }

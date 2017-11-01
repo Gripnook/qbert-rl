@@ -4,7 +4,6 @@
 #include <cstdio>
 
 #include "game-entity.h"
-#include "state.h"
 
 namespace Qbert {
 
@@ -12,7 +11,11 @@ namespace Qbert {
 static constexpr float alpha = 0.10;
 static constexpr float gamma = 0.90;
 
-Learner::Learner()
+Learner::Learner(
+    std::string name,
+    std::function<int(const StateType&, int, int, Color, Color, int)>
+        encodeState)
+    : name{name}, encodeState{encodeState}
 {
     loadFromFile();
 }
@@ -20,13 +23,15 @@ Learner::Learner()
 void Learner::update(
     std::pair<int, int> position,
     const StateType& state,
+    const Action& actionPerformed,
     float reward,
     Color startColor,
-    Color goalColor)
+    Color goalColor,
+    int level)
 {
     lastState = currentState;
-    currentState =
-        encode(state, position.first, position.second, startColor, goalColor);
+    currentState = encodeState(
+        state, position.first, position.second, startColor, goalColor, level);
 
     if (lastState != -1)
     {
@@ -43,10 +48,10 @@ void Learner::update(
     }
 
     lastAction = currentAction;
-    currentAction = tentativeAction;
+    currentAction = actionPerformed;
     ++visited[currentState][actionToIndex(currentAction)];
     if (visited[currentState][actionToIndex(currentAction)] == 1000000000)
-        --visited[currentState][actionToIndex(currentAction)]; // Avoid
+        --visited[currentState][actionToIndex(currentAction)]; // Avoids
                                                                // overflow.
     if (isRandomAction)
         ++randomActionCount;
@@ -66,10 +71,11 @@ Action Learner::getAction(
     std::pair<int, int> position,
     const StateType& state,
     Color startColor,
-    Color goalColor)
+    Color goalColor,
+    int level)
 {
-    auto currentState =
-        encode(state, position.first, position.second, startColor, goalColor);
+    auto currentState = encodeState(
+        state, position.first, position.second, startColor, goalColor, level);
     auto actions = getActions(position, state);
 
     int minVisited = visited[currentState][actionToIndex(*std::min_element(
@@ -80,7 +86,7 @@ Action Learner::getAction(
 
     if (rand() % (minVisited + 1) == 0)
     {
-        tentativeAction = actions[rand() % actions.size()];
+        auto tentativeAction = actions[rand() % actions.size()];
         isRandomAction = true;
         return tentativeAction;
     }
@@ -95,7 +101,7 @@ Action Learner::getAction(
         for (auto action : actions)
             if (utilities[currentState][actionToIndex(action)] == qMax)
                 bestActions.push_back(action);
-        tentativeAction = bestActions[rand() % bestActions.size()];
+        auto tentativeAction = bestActions[rand() % bestActions.size()];
         isRandomAction = false;
         return tentativeAction;
     }
@@ -127,12 +133,21 @@ void Learner::reset()
     lastState = -1;
     currentAction = Action::PLAYER_A_NOOP;
     lastAction = Action::PLAYER_A_NOOP;
-    tentativeAction = Action::PLAYER_A_NOOP;
     randomActionCount = 0;
     totalActionCount = 0;
     isRandomAction = true;
 
     saveToFile();
+}
+
+float Learner::getRandomActionCount()
+{
+    return randomActionCount;
+}
+
+float Learner::getTotalActionCount()
+{
+    return totalActionCount;
 }
 
 float Learner::getRandomFraction()
@@ -142,7 +157,7 @@ float Learner::getRandomFraction()
 
 void Learner::loadFromFile()
 {
-    std::ifstream is{"utilities.ai"};
+    std::ifstream is{name + ".param"};
     if (!is)
         return;
     int size;
@@ -170,7 +185,7 @@ void Learner::loadFromFile()
 
 void Learner::saveToFile()
 {
-    std::ofstream os{"temp-utilities.ai"};
+    std::ofstream os{name + ".param.temp"};
     os << utilities.size() << std::endl;
     for (const auto& p : utilities)
     {
@@ -192,6 +207,6 @@ void Learner::saveToFile()
 
 void Learner::commitFile()
 {
-    rename("temp-utilities.ai", "utilities.ai");
+    rename((name + ".param.temp").c_str(), (name + ".param").c_str());
 }
 }
