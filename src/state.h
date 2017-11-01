@@ -1,7 +1,6 @@
 #pragma once
 
 #include "image-processor.h"
-#include "screen.h"
 
 namespace Qbert {
 

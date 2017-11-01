@@ -3,16 +3,19 @@
 #include <array>
 #include <utility>
 
-#include "screen.h"
+#include <ale/ale_interface.hpp>
+
 #include "game-entity.h"
 
 namespace Qbert {
+
+using Color = int;
 
 template <typename T>
 using Grid = std::array<std::array<T, 8>, 8>;
 
 using StateType = std::pair<Grid<GameEntity>, Grid<Color>>;
 
-StateType getState(const Screen& screen);
-Color getGoal(const Screen& screen);
+StateType getState(const ALEScreen& screen);
+Color getGoal(const ALEScreen& screen);
 }

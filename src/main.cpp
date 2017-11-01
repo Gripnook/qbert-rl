@@ -9,7 +9,6 @@
 #endif
 
 #include "image-processor.h"
-#include "screen.h"
 #include "game-entity.h"
 #include "agent.h"
 
@@ -37,18 +36,13 @@ int main(int argc, char** argv)
 
     std::ofstream os{"results/scores.csv"};
     os << "Episode,Score" << std::endl;
-    // std::vector<unsigned char> rgb;
     int episode = 0;
     while (true)
     {
         ++episode;
         while (!ale.game_over())
         {
-            // ale.getScreenRGB(rgb);
-            // auto state =
-            //     getState(Screen{rgb,
-            //                     static_cast<int>(ale.getScreen().width()),
-            //                     static_cast<int>(ale.getScreen().height())});
+            // auto state = getState(ale.getScreen());
             // std::cout << "High Score: " << agent.getHighScore() << std::endl;
             // print(state);
             agent.update();
@@ -75,8 +69,7 @@ void print(const StateType& state)
     for (int i = 0; i < 8; ++i)
     {
         for (int j = 0; j < 8; ++j)
-            std::cout << "0x" << std::setfill('0') << std::hex << std::setw(6)
-                      << state.second[i][j] << std::dec << " ";
+            std::cout << std::setw(3) << state.second[i][j] << " ";
         std::cout << std::endl;
     }
 }

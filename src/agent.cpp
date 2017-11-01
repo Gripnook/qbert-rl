@@ -10,10 +10,7 @@ Agent::Agent(ALEInterface& ale) : ale{ale}
 
 void Agent::update()
 {
-    ale.getScreenRGB(rgb);
-    Screen screen{rgb,
-                  static_cast<int>(ale.getScreen().width()),
-                  static_cast<int>(ale.getScreen().height())};
+    auto screen = ale.getScreen();
 
     Color color = getGoal(screen);
     if (color != 0)

@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <unordered_map>
-#include <tuple>
 
 namespace Qbert {
 
@@ -58,28 +57,31 @@ static constexpr int xBackgroundStart = 0;
 static constexpr int yBackgroundStart = 0;
 
 std::pair<std::vector<GameEntity>, std::vector<Color>>
-    extractFeatures(const Screen& screen);
+    extractFeatures(const ALEScreen& screen);
 
-bool isOrange(const Color& color);
-bool isPurple(const Color& color);
-bool isRed(const Color& color);
-std::tuple<int, int, int> rgb(const Color& color);
+bool isQbert(const Color& color);
+bool isPurpleEnemy(const Color& color);
+bool isGreenEnemy(const Color& color);
 
-void addDiscs(Grid<GameEntity>& entities, const Screen& screen);
+void addDiscs(Grid<GameEntity>& entities, const ALEScreen& screen);
 
-Color getBackground(const Screen& screen);
+Color getBackground(const ALEScreen& screen);
 std::unordered_map<Color, int> getColorCounts(
-    const Screen& screen,
+    const ALEScreen& screen,
     int rowBegin,
     int rowEnd,
     int colBegin,
     int colEnd,
     Color background);
 std::unordered_map<Color, int> getColorCounts(
-    const Screen& screen, int rowBegin, int rowEnd, int colBegin, int colEnd);
+    const ALEScreen& screen,
+    int rowBegin,
+    int rowEnd,
+    int colBegin,
+    int colEnd);
 Color getMaxColor(const std::unordered_map<Color, int>& counts);
 
-StateType getState(const Screen& screen)
+StateType getState(const ALEScreen& screen)
 {
     auto features = extractFeatures(screen);
     Grid<GameEntity> entities{};
@@ -102,7 +104,7 @@ StateType getState(const Screen& screen)
 }
 
 std::pair<std::vector<GameEntity>, std::vector<Color>>
-    extractFeatures(const Screen& screen)
+    extractFeatures(const ALEScreen& screen)
 {
     std::vector<GameEntity> entities;
     std::vector<Color> colors;
@@ -128,14 +130,14 @@ std::pair<std::vector<GameEntity>, std::vector<Color>>
         Color maxColor = getMaxColor(counts);
         if (counts.empty())
             entities.push_back(GameEntity::None);
-        else if (isOrange(maxColor))
+        else if (isQbert(maxColor))
             entities.push_back(GameEntity::Qbert);
-        else if (isPurple(maxColor))
+        else if (isPurpleEnemy(maxColor))
             entities.push_back(GameEntity::PurpleEnemy);
-        else if (isRed(maxColor))
-            entities.push_back(GameEntity::RedEnemy);
-        else
+        else if (isGreenEnemy(maxColor))
             entities.push_back(GameEntity::GreenEnemy);
+        else
+            entities.push_back(GameEntity::RedEnemy);
     }
 
     for (int i = 0; i < numBlocks; ++i)
@@ -158,36 +160,22 @@ std::pair<std::vector<GameEntity>, std::vector<Color>>
     return {entities, colors};
 }
 
-bool isOrange(const Color& color)
+bool isQbert(const Color& color)
 {
-    int red, green, blue;
-    std::tie(red, green, blue) = rgb(color);
-    return red >= 128 && (green >= 64 && green < 128) && blue < 128;
+    return color == 52;
 }
 
-bool isPurple(const Color& color)
+bool isPurpleEnemy(const Color& color)
 {
-    int red, green, blue;
-    std::tie(red, green, blue) = rgb(color);
-    return red >= 128 && green < 128 && blue >= 128;
+    return color == 102;
 }
 
-bool isRed(const Color& color)
+bool isGreenEnemy(const Color& color)
 {
-    int red, green, blue;
-    std::tie(red, green, blue) = rgb(color);
-    return red >= 128 && green < 64 && blue < 128;
+    return color == 196;
 }
 
-std::tuple<int, int, int> rgb(const Color& color)
-{
-    int red = (color & 0x00FF0000) >> 16;
-    int green = (color & 0x0000FF00) >> 8;
-    int blue = (color & 0x000000FF);
-    return std::make_tuple(red, green, blue);
-}
-
-void addDiscs(Grid<GameEntity>& entities, const Screen& screen)
+void addDiscs(Grid<GameEntity>& entities, const ALEScreen& screen)
 {
     int xScale = width / screen.width();
     int yScale = height / screen.height();
@@ -207,7 +195,7 @@ void addDiscs(Grid<GameEntity>& entities, const Screen& screen)
     }
 }
 
-Color getGoal(const Screen& screen)
+Color getGoal(const ALEScreen& screen)
 {
     int xScale = width / screen.width();
     int yScale = height / screen.height();
@@ -225,7 +213,7 @@ Color getGoal(const Screen& screen)
     return counts.empty() ? 0 : getMaxColor(counts);
 }
 
-Color getBackground(const Screen& screen)
+Color getBackground(const ALEScreen& screen)
 {
     int xScale = width / screen.width();
     int yScale = height / screen.height();
@@ -242,7 +230,7 @@ Color getBackground(const Screen& screen)
 }
 
 std::unordered_map<Color, int> getColorCounts(
-    const Screen& screen,
+    const ALEScreen& screen,
     int rowBegin,
     int rowEnd,
     int colBegin,
@@ -263,7 +251,7 @@ std::unordered_map<Color, int> getColorCounts(
 }
 
 std::unordered_map<Color, int> getColorCounts(
-    const Screen& screen, int rowBegin, int rowEnd, int colBegin, int colEnd)
+    const ALEScreen& screen, int rowBegin, int rowEnd, int colBegin, int colEnd)
 {
     std::unordered_map<Color, int> counts;
     for (int r = rowBegin; r < rowEnd; ++r)

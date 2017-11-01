@@ -6,7 +6,6 @@
 #include <ale/ale_interface.hpp>
 
 #include "image-processor.h"
-#include "screen.h"
 #include "learner.h"
 
 namespace Qbert {
@@ -16,7 +15,6 @@ class Agent
     ALEInterface& ale;
     Learner learner;
 
-    std::vector<unsigned char> rgb;
     Color goal{0};
 
     int lives{0};

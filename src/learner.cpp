@@ -1,6 +1,5 @@
 #include "learner.h"
 
-#include "screen.h"
 #include "game-entity.h"
 #include "state.h"
 

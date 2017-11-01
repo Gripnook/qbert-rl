@@ -18,7 +18,7 @@ ifdef USE_SDL
 	CXXFLAGS += -DUSE_SDL
 endif
 LIBFLAGS := -lale
-SRCS := main.cpp image-processor.cpp screen.cpp game-entity.cpp agent.cpp learner.cpp state.cpp
+SRCS := main.cpp agent.cpp learner.cpp state.cpp image-processor.cpp game-entity.cpp
 DIRECTORIES := 
 
 
