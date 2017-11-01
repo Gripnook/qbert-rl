@@ -13,7 +13,9 @@ Agent::Agent(ALEInterface& ale) : ale{ale}
 void Agent::update()
 {
     auto screen = ale.getScreen();
-    update(getState(screen), screen);
+    auto state = getState(screen);
+    fixState(state);
+    update(state, screen);
 
     float currentReward = ale.act(action);
     reward += currentReward;
@@ -168,5 +170,16 @@ float Agent::getRandomFraction()
     float totalActionCount =
         blockSolver.getTotalActionCount() + enemyAvoider.getTotalActionCount();
     return totalActionCount == 0 ? 0 : randomActionCount / totalActionCount;
+}
+
+void Agent::fixState(StateType& state)
+{
+    auto ram = ale.getRAM();
+    int xCoily = ram.get(0xA7);
+    int yCoily = ram.get(0xC5);
+    int x = (xCoily - yCoily + 5) / 2 + 1;
+    int y = (xCoily + yCoily - 5) / 2 + 1;
+    if (x >= 0 && x < 8 && y >= 0 && y < 8 && state.second[x][y] != 0)
+        state.first[x][y] = GameEntity::PurpleEnemy;
 }
 }

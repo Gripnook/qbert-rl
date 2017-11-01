@@ -52,5 +52,7 @@ private:
     Action getAction(const StateType& state);
 
     std::pair<int, int> getPlayerPosition(const StateType& state);
+
+    void fixState(StateType& state);
 };
 }
