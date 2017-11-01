@@ -14,7 +14,7 @@
 # Configuration Settings
 TARGET := agent.exe
 CXXFLAGS := -std=c++1y -Wall -Wextra -pedantic -Isrc
-ifdef USE_SDL
+ifeq ($(USE_SDL), ON)
 	CXXFLAGS += -DUSE_SDL
 endif
 LIBFLAGS := -lale
