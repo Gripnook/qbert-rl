@@ -19,6 +19,10 @@ class Learner
         lastAction{Action::PLAYER_A_NOOP};
     Action tentativeAction{Action::PLAYER_A_NOOP};
 
+    float randomActionCount{0};
+    float totalActionCount{0};
+    bool isRandomAction{true};
+
 public:
     void update(
         std::pair<int, int> position,
@@ -35,6 +39,8 @@ public:
         Color goalColor);
 
     void reset();
+
+    float getRandomFraction();
 
 private:
     std::vector<Action>

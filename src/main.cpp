@@ -35,7 +35,7 @@ int main(int argc, char** argv)
     Agent agent{ale};
 
     std::ofstream os{"results/scores.csv"};
-    os << "Episode,Score" << std::endl;
+    os << "Episode,Score,Random" << std::endl;
     int episode = 0;
     while (true)
     {
@@ -47,7 +47,8 @@ int main(int argc, char** argv)
             // print(state);
             agent.update();
         }
-        os << episode << "," << agent.getScore() << std::endl;
+        os << episode << "," << agent.getScore() << ","
+           << agent.getRandomFraction() << std::endl;
         ale.reset_game();
         agent.resetGame();
     }

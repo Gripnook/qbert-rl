@@ -37,6 +37,12 @@ void Learner::update(
     lastAction = currentAction;
     currentAction = tentativeAction;
     ++visited[currentState][actionToIndex(currentAction)];
+    if (visited[currentState][actionToIndex(currentAction)] == 1000000000)
+        --visited[currentState][actionToIndex(currentAction)]; // Avoid
+                                                               // overflow.
+    if (isRandomAction)
+        ++randomActionCount;
+    ++totalActionCount;
 }
 
 void Learner::correctUpdate(float reward)
@@ -67,6 +73,7 @@ Action Learner::getAction(
     if (rand() % (minVisited + 1) == 0)
     {
         tentativeAction = actions[rand() % actions.size()];
+        isRandomAction = true;
         return tentativeAction;
     }
     else
@@ -81,6 +88,7 @@ Action Learner::getAction(
             if (utilities[currentState][actionToIndex(action)] == qMax)
                 bestActions.push_back(action);
         tentativeAction = bestActions[rand() % bestActions.size()];
+        isRandomAction = false;
         return tentativeAction;
     }
 }
@@ -112,5 +120,13 @@ void Learner::reset()
     currentAction = Action::PLAYER_A_NOOP;
     lastAction = Action::PLAYER_A_NOOP;
     tentativeAction = Action::PLAYER_A_NOOP;
+    randomActionCount = 0;
+    totalActionCount = 0;
+    isRandomAction = true;
+}
+
+float Learner::getRandomFraction()
+{
+    return totalActionCount == 0 ? 0 : randomActionCount / totalActionCount;
 }
 }

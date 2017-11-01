@@ -118,4 +118,9 @@ float Agent::getHighScore()
 {
     return highScore;
 }
+
+float Agent::getRandomFraction()
+{
+    return learner.getRandomFraction();
+}
 }

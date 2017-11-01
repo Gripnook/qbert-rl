@@ -36,6 +36,8 @@ public:
     float getScore();
     float getHighScore();
 
+    float getRandomFraction();
+
 private:
     void update(const StateType& state, const ALEScreen& screen);
     void updateColors(
