@@ -6,7 +6,8 @@ namespace Qbert {
 
 bool isDangerousEnemy(const GameEntity& entity)
 {
-    return entity == GameEntity::PurpleEnemy || entity == GameEntity::RedEnemy;
+    return entity == GameEntity::Coily || entity == GameEntity::PurpleEnemy ||
+        entity == GameEntity::RedEnemy;
 }
 
 std::string toString(const GameEntity& entity)
@@ -19,6 +20,8 @@ std::string toString(const GameEntity& entity)
         return "_";
     case GameEntity::Qbert:
         return "q";
+    case GameEntity::Coily:
+        return "c";
     case GameEntity::PurpleEnemy:
         return "p";
     case GameEntity::RedEnemy:
