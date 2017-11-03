@@ -10,7 +10,7 @@ Agent::Agent(ALEInterface& ale) : ale{ale}
 {
 }
 
-void Agent::update()
+void Agent::updateState()
 {
     auto screen = ale.getScreen();
     auto state = getState(screen);
@@ -43,11 +43,19 @@ void Agent::update(const StateType& state, const ALEScreen& screen)
         }
         else
         {
-            action = getAction(state);
+            action =
+                getAction(positionTracker, state, startColor, goalColor, level);
             if (positionTracker != playerPosition)
             {
                 playerPosition = positionTracker;
-                update(state, reward);
+                update(
+                    playerPosition,
+                    state,
+                    action,
+                    reward,
+                    startColor,
+                    goalColor,
+                    level);
                 reward = 0;
             }
             else
@@ -93,66 +101,6 @@ void Agent::updateColors(
     }
 }
 
-void Agent::update(const StateType& state, float reward)
-{
-    // The reward for a block changing color is +25, and the rewards involving
-    // enemies are all multiples of 100, so we can divide the rewards
-    // accurately by taking the positive modulus 100 for the block solver and
-    // the rest for the enemy avoider.
-    float blockSolverReward = fmod((fmod(reward, 100) + 100), 100);
-    float enemyAvoiderReward = reward - blockSolverReward;
-    blockSolver.update(
-        playerPosition,
-        state,
-        action,
-        blockSolverReward,
-        startColor,
-        goalColor,
-        level);
-    enemyAvoider.update(
-        playerPosition,
-        state,
-        action,
-        enemyAvoiderReward,
-        startColor,
-        goalColor,
-        level);
-    if (enemyAvoiderActionTaken)
-        enemyAvoider.notifyActionTaken();
-    else
-        blockSolver.notifyActionTaken();
-}
-
-void Agent::correctUpdate(float reward)
-{
-    // The reward for a block changing color is +25, and the rewards involving
-    // enemies are all multiples of 100, so we can divide the rewards
-    // accurately by taking the positive modulus 100 for the block solver and
-    // the rest for the enemy avoider.
-    float blockSolverReward = fmod((fmod(reward, 100) + 100), 100);
-    float enemyAvoiderReward = reward - blockSolverReward;
-    blockSolver.correctUpdate(blockSolverReward);
-    enemyAvoider.correctUpdate(enemyAvoiderReward);
-}
-
-Action Agent::getAction(const StateType& state)
-{
-    // We use the presence of enemies to suppress the block solver and focus on
-    // enemy avoidance.
-    if (hasEnemiesNearby(state, positionTracker.first, positionTracker.second))
-    {
-        enemyAvoiderActionTaken = true;
-        return enemyAvoider.getAction(
-            positionTracker, state, startColor, goalColor, level);
-    }
-    else
-    {
-        enemyAvoiderActionTaken = false;
-        return blockSolver.getAction(
-            positionTracker, state, startColor, goalColor, level);
-    }
-}
-
 std::pair<int, int> Agent::getPlayerPosition(const StateType& state)
 {
     for (int i = 0; i < 8; ++i)
@@ -164,9 +112,6 @@ std::pair<int, int> Agent::getPlayerPosition(const StateType& state)
 
 void Agent::resetGame()
 {
-    blockSolver.reset();
-    enemyAvoider.reset();
-    enemyAvoiderActionTaken = false;
     startColor = 0;
     goalColor = 0;
     levelUpCounter = 0;
@@ -188,15 +133,6 @@ float Agent::getScore()
 float Agent::getHighScore()
 {
     return highScore;
-}
-
-float Agent::getRandomFraction()
-{
-    float randomActionCount = blockSolver.getRandomActionCount() +
-        enemyAvoider.getRandomActionCount();
-    float totalActionCount =
-        blockSolver.getTotalActionCount() + enemyAvoider.getTotalActionCount();
-    return totalActionCount == 0 ? 0 : randomActionCount / totalActionCount;
 }
 
 void Agent::fixState(StateType& state)

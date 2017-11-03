@@ -18,7 +18,7 @@ ifeq ($(USE_SDL), ON)
 	CXXFLAGS += -DUSE_SDL
 endif
 LIBFLAGS := -lale
-SRCS := main.cpp agent.cpp learner.cpp state.cpp image-processor.cpp game-entity.cpp
+SRCS := main.cpp agent.cpp subsumption-agent-2.cpp learner.cpp state.cpp image-processor.cpp game-entity.cpp
 DIRECTORIES := 
 
 

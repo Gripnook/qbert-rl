@@ -1,25 +1,20 @@
 #pragma once
 
-#include <vector>
 #include <utility>
 
 #include <ale/ale_interface.hpp>
 
 #include "image-processor.h"
-#include "learner.h"
-#include "state.h"
 
 namespace Qbert {
 
-// A class that implements a learning agent that uses a subsumption architecture
-// to divide the model into two learners. One of these learners is responsible
-// for dealing with block puzzle solving, and the other with avoiding enemies.
+// A class that implements a learning agent. This class is responsible for
+// dealing with the technicalities of the ALE, such as finding the right frames
+// to trigger updates on and getting the state representation. Subclasses should
+// implement specific learner structures.
 class Agent
 {
     ALEInterface& ale;
-    Learner blockSolver{"block-solver", encodeBlockSolverState};
-    Learner enemyAvoider{"enemy-avoider", encodeEnemyAvoiderState};
-    bool enemyAvoiderActionTaken{false};
 
     Color startColor{0}, goalColor{0};
     int levelUpCounter{0};
@@ -38,11 +33,13 @@ public:
     // Contructs an agent with a reference to the current ALE instance.
     Agent(ALEInterface& ale);
 
+    virtual ~Agent() = default;
+
     // Updates the state of the game. This should be called every frame.
-    void update();
+    void updateState();
 
     // Resets the agent after a game over.
-    void resetGame();
+    virtual void resetGame();
 
     // Returns the current score for this game.
     float getScore();
@@ -51,7 +48,7 @@ public:
     float getHighScore();
 
     // Returns the fraction of random actions taken.
-    float getRandomFraction();
+    virtual float getRandomFraction() = 0;
 
 private:
     // Updates the learner if the current frame lends itself to updates. This is
@@ -64,13 +61,25 @@ private:
         const StateType& state, const ALEScreen& screen, float reward);
 
     // Assigns the given reward to the learners.
-    void update(const StateType& state, float reward);
+    virtual void update(
+        std::pair<int, int> position,
+        const StateType& state,
+        const Action& actionPerformed,
+        float reward,
+        Color startColor,
+        Color goalColor,
+        int level) = 0;
 
     // Assigns an additional reward to the learners without updating the state.
-    void correctUpdate(float reward);
+    virtual void correctUpdate(float reward) = 0;
 
     // Gets the best action from the learners.
-    Action getAction(const StateType& state);
+    virtual Action getAction(
+        std::pair<int, int> position,
+        const StateType& state,
+        Color startColor,
+        Color goalColor,
+        int level) = 0;
 
     // Gets Qbert's position from the state.
     std::pair<int, int> getPlayerPosition(const StateType& state);

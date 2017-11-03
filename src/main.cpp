@@ -10,7 +10,7 @@
 
 #include "image-processor.h"
 #include "game-entity.h"
-#include "agent.h"
+#include "subsumption-agent-2.h"
 
 using namespace Qbert;
 
@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 #endif
     ale.loadROM(argv[1]);
 
-    Agent agent{ale};
+    SubsumptionAgent2 agent{ale};
 
     std::ofstream os{"results/scores.csv"};
     os << "Episode,Score,Random" << std::endl;
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
             // auto state = getState(ale.getScreen());
             // std::cout << "High Score: " << agent.getHighScore() << std::endl;
             // print(state);
-            agent.update();
+            agent.updateState();
         }
         os << episode << "," << agent.getScore() << ","
            << agent.getRandomFraction() << std::endl;
