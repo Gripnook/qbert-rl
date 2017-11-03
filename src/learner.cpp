@@ -8,11 +8,7 @@
 namespace Qbert {
 
 Learner::Learner(
-    std::string name,
-    std::function<int(const StateType&, int, int, Color, Color, int)>
-        encodeState,
-    float alpha,
-    float gamma)
+    std::string name, StateEncoding encodeState, float alpha, float gamma)
     : name{name}, encodeState{encodeState}, alpha{alpha}, gamma{gamma}
 {
     loadFromFile();

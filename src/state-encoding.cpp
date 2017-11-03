@@ -1,4 +1,4 @@
-#include "state.h"
+#include "state-encoding.h"
 
 #include "game-entity.h"
 

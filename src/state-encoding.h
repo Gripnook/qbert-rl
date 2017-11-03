@@ -1,8 +1,18 @@
 #pragma once
 
+#include <functional>
+
 #include "image-processor.h"
 
 namespace Qbert {
+
+using StateEncoding = std::function<
+    int(const StateType& state,
+        int x,
+        int y,
+        Color startColor,
+        Color goalColor,
+        int level)>;
 
 // int encodeState(
 //     const StateType& state,

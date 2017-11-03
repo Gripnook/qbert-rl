@@ -4,11 +4,11 @@
 #include <unordered_map>
 #include <string>
 #include <utility>
-#include <functional>
 
 #include <ale/ale_interface.hpp>
 
 #include "image-processor.h"
+#include "state-encoding.h"
 
 namespace Qbert {
 
@@ -16,8 +16,7 @@ namespace Qbert {
 class Learner
 {
     const std::string name;
-    const std::function<int(const StateType&, int, int, Color, Color, int)>
-        encodeState;
+    const StateEncoding encodeState;
     const float alpha, gamma;
 
     std::unordered_map<int, std::array<float, 5>> utilities;
@@ -35,8 +34,7 @@ public:
     // learning parameters.
     Learner(
         std::string name,
-        std::function<int(const StateType&, int, int, Color, Color, int)>
-            encodeState,
+        StateEncoding encodeState,
         float alpha = 0.10f,
         float gamma = 0.90f);
 

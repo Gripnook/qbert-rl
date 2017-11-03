@@ -2,7 +2,7 @@
 
 #include "agent.h"
 #include "learner.h"
-#include "state.h"
+#include "state-encoding.h"
 
 namespace Qbert {
 
