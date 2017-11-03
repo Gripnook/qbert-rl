@@ -30,6 +30,8 @@ class Agent
     std::pair<int, int> playerPosition{0, 0};
     std::pair<int, int> positionTracker{0, 0};
 
+    int learnerActionChosen{0};
+
 public:
     Agent(ALEInterface& ale);
 

@@ -7,15 +7,13 @@
 
 namespace Qbert {
 
-// TODO
-static constexpr float alpha = 0.10;
-static constexpr float gamma = 0.90;
-
 Learner::Learner(
     std::string name,
     std::function<int(const StateType&, int, int, Color, Color, int)>
-        encodeState)
-    : name{name}, encodeState{encodeState}
+        encodeState,
+    float alpha,
+    float gamma)
+    : name{name}, encodeState{encodeState}, alpha{alpha}, gamma{gamma}
 {
     loadFromFile();
 }
@@ -53,9 +51,6 @@ void Learner::update(
     if (visited[currentState][actionToIndex(currentAction)] == 1000000000)
         --visited[currentState][actionToIndex(currentAction)]; // Avoids
                                                                // overflow.
-    if (isRandomAction)
-        ++randomActionCount;
-    ++totalActionCount;
 }
 
 void Learner::correctUpdate(float reward)
@@ -84,6 +79,8 @@ Action Learner::getAction(
                 visited[currentState][actionToIndex(rhs)];
         }))];
 
+    // If we didn't explore the actions in this state enough, we choose a random
+    // action to allow the agent more opportunity to learn.
     if (rand() % (minVisited + 1) == 0)
     {
         auto tentativeAction = actions[rand() % actions.size()];
@@ -107,10 +104,18 @@ Action Learner::getAction(
     }
 }
 
+void Learner::notifyActionTaken()
+{
+    if (isRandomAction)
+        ++randomActionCount;
+    ++totalActionCount;
+}
+
 std::vector<Action>
     Learner::getActions(std::pair<int, int> position, const StateType& state)
 {
     std::vector<Action> actions;
+    actions.push_back(Action::PLAYER_A_NOOP);
     if (state.first[position.first - 1][position.second] != GameEntity::Void)
         actions.push_back(Action::PLAYER_A_UP);
     if (state.first[position.first][position.second + 1] != GameEntity::Void)
@@ -124,7 +129,7 @@ std::vector<Action>
 
 int Learner::actionToIndex(const Action& action)
 {
-    return action - 2;
+    return action == Action::PLAYER_A_NOOP ? 0 : action - 1;
 }
 
 void Learner::reset()
@@ -166,8 +171,8 @@ void Learner::loadFromFile()
     {
         int state;
         is >> state;
-        std::array<float, 4> utility;
-        for (int j = 0; j < 4; ++j)
+        std::array<float, 5> utility;
+        for (int j = 0; j < 5; ++j)
             is >> utility[j];
         utilities[state] = utility;
     }
@@ -176,8 +181,8 @@ void Learner::loadFromFile()
     {
         int state;
         is >> state;
-        std::array<int, 4> counts;
-        for (int j = 0; j < 4; ++j)
+        std::array<int, 5> counts;
+        for (int j = 0; j < 5; ++j)
             is >> counts[j];
         visited[state] = counts;
     }

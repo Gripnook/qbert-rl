@@ -32,7 +32,7 @@ void Agent::update(const StateType& state, const ALEScreen& screen)
     positionTracker = getPlayerPosition(state);
 
     auto ram = ale.getRAM();
-    if (ram.get(0) == 0 && (ram.get(ram.size() - 1) & 0x01) == 1)
+    if (ram.get(0x00) == 0 && (ram.get(0x7F) & 0x01) == 1)
     {
         updateColors(state, screen, reward);
         if (levelUp)
@@ -108,6 +108,10 @@ void Agent::update(const StateType& state, float reward)
         startColor,
         goalColor,
         level);
+    if (learnerActionChosen == 0)
+        blockSolver.notifyActionTaken();
+    else
+        enemyAvoider.notifyActionTaken();
 }
 
 void Agent::correctUpdate(float reward)
@@ -120,11 +124,17 @@ void Agent::correctUpdate(float reward)
 Action Agent::getAction(const StateType& state)
 {
     if (hasEnemiesNearby(state, positionTracker.first, positionTracker.second))
+    {
+        learnerActionChosen = 1;
         return enemyAvoider.getAction(
             positionTracker, state, startColor, goalColor, level);
+    }
     else
+    {
+        learnerActionChosen = 0;
         return blockSolver.getAction(
             positionTracker, state, startColor, goalColor, level);
+    }
 }
 
 std::pair<int, int> Agent::getPlayerPosition(const StateType& state)
@@ -151,6 +161,7 @@ void Agent::resetGame()
     action = Action::PLAYER_A_NOOP;
     playerPosition = {0, 0};
     positionTracker = {0, 0};
+    learnerActionChosen = 0;
 }
 
 float Agent::getScore()
@@ -180,6 +191,6 @@ void Agent::fixState(StateType& state)
     int x = (xCoily - yCoily + 5) / 2 + 1;
     int y = (xCoily + yCoily - 5) / 2 + 1;
     if (x >= 0 && x < 8 && y >= 0 && y < 8 && state.second[x][y] != 0)
-        state.first[x][y] = GameEntity::PurpleEnemy;
+        state.first[x][y] = GameEntity::Coily;
 }
 }
