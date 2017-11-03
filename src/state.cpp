@@ -34,7 +34,7 @@ bool checkColor(const StateType& state, int x, int y, Color color);
 
 int countMoves(const StateType& state, int x, int y);
 
-int encodeBlockSolverState(
+int encodeBlockState(
     const StateType& state,
     int x,
     int y,
@@ -69,7 +69,7 @@ int encodeBlockSolverState(
     return result;
 }
 
-int encodeEnemyAvoiderState(
+int encodeEnemyState(
     const StateType& state,
     int x,
     int y,

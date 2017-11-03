@@ -11,8 +11,8 @@ namespace Qbert {
 // for dealing with block puzzle solving, and the other with avoiding enemies.
 class SubsumptionAgent2 : public Agent
 {
-    Learner blockSolver{"s2-block-solver", encodeBlockSolverState};
-    Learner enemyAvoider{"s2-enemy-avoider", encodeEnemyAvoiderState};
+    Learner blockSolver{"s2-block-solver", encodeBlockState};
+    Learner enemyAvoider{"s2-enemy-avoider", encodeEnemyState};
     bool enemyAvoiderActionTaken{false};
 
 public:
