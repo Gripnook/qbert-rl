@@ -9,6 +9,7 @@
 
 #include "image-processor.h"
 #include "state-encoding.h"
+#include "exploration-policy.h"
 
 namespace Qbert {
 
@@ -17,6 +18,7 @@ class Learner
 {
     const std::string name;
     const StateEncoding encodeState;
+    const ExplorationPolicy explore;
     const float alpha, gamma;
 
     std::unordered_map<int, std::array<float, 5>> utilities;
@@ -30,11 +32,12 @@ class Learner
     bool isRandomAction{true};
 
 public:
-    // Constructs a learner with the given name, state encoding function, and
-    // learning parameters.
+    // Constructs a learner with the given name, state encoding function,
+    // exploration policy, and learning parameters.
     Learner(
         std::string name,
         StateEncoding encodeState,
+        ExplorationPolicy explore,
         float alpha = 0.10f,
         float gamma = 0.90f);
 

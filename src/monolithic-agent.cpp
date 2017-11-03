@@ -3,8 +3,11 @@
 namespace Qbert {
 
 MonolithicAgent::MonolithicAgent(
-    ALEInterface& ale, const std::string& name, StateEncoding encodeState)
-    : Agent{ale}, learner{name + "-learner", encodeState}
+    ALEInterface& ale,
+    const std::string& name,
+    StateEncoding encodeState,
+    ExplorationPolicy explore)
+    : Agent{ale}, learner{name + "-learner", encodeState, explore}
 {
 }
 

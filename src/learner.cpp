@@ -2,14 +2,23 @@
 
 #include <fstream>
 #include <cstdio>
+#include <cstdlib>
 
 #include "game-entity.h"
 
 namespace Qbert {
 
 Learner::Learner(
-    std::string name, StateEncoding encodeState, float alpha, float gamma)
-    : name{name}, encodeState{encodeState}, alpha{alpha}, gamma{gamma}
+    std::string name,
+    StateEncoding encodeState,
+    ExplorationPolicy explore,
+    float alpha,
+    float gamma)
+    : name{name},
+      encodeState{encodeState},
+      explore{explore},
+      alpha{alpha},
+      gamma{gamma}
 {
     loadFromFile();
 }
@@ -77,7 +86,7 @@ Action Learner::getAction(
 
     // If we didn't explore the actions in this state enough, we choose a random
     // action to allow the agent more opportunity to learn.
-    if (rand() % (minVisited + 1) == 0)
+    if (explore(minVisited))
     {
         auto tentativeAction = actions[rand() % actions.size()];
         isRandomAction = true;

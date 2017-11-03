@@ -5,6 +5,7 @@
 #include "agent.h"
 #include "learner.h"
 #include "state-encoding.h"
+#include "exploration-policy.h"
 
 namespace Qbert {
 
@@ -19,12 +20,14 @@ class SubsumptionAgent2 : public Agent
 
 public:
     // Contructs an agent with a reference to the current ALE instance, the
-    // given name, and the given state encoding functions.
+    // given name, the given state encoding functions, and the given
+    // exploration policy.
     SubsumptionAgent2(
         ALEInterface& ale,
         const std::string& name,
         StateEncoding encodeBlockState,
-        StateEncoding encodeEnemyState);
+        StateEncoding encodeEnemyState,
+        ExplorationPolicy explore);
 
     virtual ~SubsumptionAgent2() = default;
 

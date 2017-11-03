@@ -6,10 +6,11 @@ SubsumptionAgent2::SubsumptionAgent2(
     ALEInterface& ale,
     const std::string& name,
     StateEncoding encodeBlockState,
-    StateEncoding encodeEnemyState)
+    StateEncoding encodeEnemyState,
+    ExplorationPolicy explore)
     : Agent{ale},
-      blockSolver{name + "-block-solver", encodeBlockState},
-      enemyAvoider{name + "-enemy-avoider", encodeEnemyState}
+      blockSolver{name + "-block-solver", encodeBlockState, explore},
+      enemyAvoider{name + "-enemy-avoider", encodeEnemyState, explore}
 {
 }
 

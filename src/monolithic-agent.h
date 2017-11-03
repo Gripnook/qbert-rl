@@ -5,6 +5,7 @@
 #include "agent.h"
 #include "learner.h"
 #include "state-encoding.h"
+#include "exploration-policy.h"
 
 namespace Qbert {
 
@@ -15,9 +16,13 @@ class MonolithicAgent : public Agent
 
 public:
     // Contructs an agent with a reference to the current ALE instance, the
-    // given name, and the given state encoding function.
+    // given name, the given state encoding function, and the given
+    // exploration policy.
     MonolithicAgent(
-        ALEInterface& ale, const std::string& name, StateEncoding encodeState);
+        ALEInterface& ale,
+        const std::string& name,
+        StateEncoding encodeState,
+        ExplorationPolicy explore);
 
     virtual ~MonolithicAgent() = default;
 

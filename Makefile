@@ -19,7 +19,7 @@ ifeq ($(USE_SDL), ON)
 endif
 LIBFLAGS := -lale
 SRCS := main.cpp agent.cpp monolithic-agent.cpp subsumption-agent-2.cpp learner.cpp \
-	state-encoding.cpp image-processor.cpp game-entity.cpp
+	state-encoding.cpp exploration-policy.cpp image-processor.cpp game-entity.cpp
 DIRECTORIES := 
 
 

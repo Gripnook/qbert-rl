@@ -13,6 +13,7 @@
 #include "monolithic-agent.h"
 #include "subsumption-agent-2.h"
 #include "state-encoding.h"
+#include "exploration-policy.h"
 
 using namespace Qbert;
 
@@ -37,7 +38,8 @@ int main(int argc, char** argv)
     SubsumptionAgent2 agent{ale,
                             "s2-coil",
                             encodeBlockState,
-                            encodeEnemyStateWithSeparateCoily};
+                            encodeEnemyStateWithSeparateCoily,
+                            ExploreInverseProportional{}};
 
     std::ofstream os{"results/scores.csv"};
     os << "Episode,Score,Random" << std::endl;
