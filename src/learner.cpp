@@ -115,7 +115,6 @@ std::vector<Action>
     Learner::getActions(std::pair<int, int> position, const StateType& state)
 {
     std::vector<Action> actions;
-    actions.push_back(Action::PLAYER_A_NOOP);
     if (state.first[position.first - 1][position.second] != GameEntity::Void)
         actions.push_back(Action::PLAYER_A_UP);
     if (state.first[position.first][position.second + 1] != GameEntity::Void)

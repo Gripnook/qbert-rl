@@ -28,6 +28,14 @@ int encodeEnemyState(
     Color goalColor,
     int level);
 
+int encodeEnemyStateWithSeparateCoily(
+    const StateType& state,
+    int x,
+    int y,
+    Color startColor,
+    Color goalColor,
+    int level);
+
 // int encodeDangerousEnemyState(
 //     const StateType& state,
 //     int x,

@@ -12,7 +12,7 @@ namespace Qbert {
 class SubsumptionAgent2 : public Agent
 {
     Learner blockSolver{"s2-block-solver", encodeBlockState};
-    Learner enemyAvoider{"s2-enemy-avoider", encodeEnemyState};
+    Learner enemyAvoider{"s2-enemy-avoider", encodeEnemyStateWithSeparateCoily};
     bool enemyAvoiderActionTaken{false};
 
 public:

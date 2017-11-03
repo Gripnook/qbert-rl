@@ -4,7 +4,15 @@
 
 namespace Qbert {
 
+int encodeDangerousEnemies(const StateType& state, int x, int y);
+int encodeCoily(const StateType& state, int x, int y);
+int encodeDangerousBalls(const StateType& state, int x, int y);
+int encodeGreenEnemies(const StateType& state, int x, int y);
+int encodeDiscs(const StateType& state, int x, int y);
+
 bool checkDangerousEnemy(const StateType& state, int x, int y);
+bool checkCoily(const StateType& state, int x, int y);
+bool checkDangerousBalls(const StateType& state, int x, int y);
 bool checkGreenEnemy(const StateType& state, int x, int y);
 bool checkDisc(const StateType& state, int x, int y);
 bool checkVoid(const StateType& state, int x, int y);
@@ -79,6 +87,63 @@ int encodeEnemyState(
 {
     int result = 0;
 
+    result |= encodeDangerousEnemies(state, x, y) << 0;
+    result |= encodeGreenEnemies(state, x, y) << 8;
+    result |= encodeDiscs(state, x, y) << 13;
+
+    result |= countMoves(state, x, y) << 16;
+    result |= ((x + 1) >> 1) << 20;
+    result |= ((y + 1) >> 1) << 22;
+
+    return result;
+}
+
+int encodeEnemyStateWithSeparateCoily(
+    const StateType& state,
+    int x,
+    int y,
+    Color /*startColor*/,
+    Color /*goalColor*/,
+    int /*level*/)
+{
+    int result = 0;
+
+    result |= encodeCoily(state, x, y) << 0;
+    result |= encodeDangerousBalls(state, x, y) << 4;
+    result |= encodeGreenEnemies(state, x, y) << 11;
+    result |= encodeDiscs(state, x, y) << 16;
+
+    result |= countMoves(state, x, y) << 19;
+    result |= ((x + 1) >> 1) << 23;
+    result |= ((y + 1) >> 1) << 25;
+
+    return result;
+}
+
+bool hasEnemiesNearby(const StateType& state, int x, int y)
+{
+    return checkCoily(state, x - 2, y) || checkCoily(state, x - 1, y - 1) ||
+        checkCoily(state, x - 1, y) || checkCoily(state, x - 1, y + 1) ||
+        checkCoily(state, x, y - 2) || checkCoily(state, x, y - 1) ||
+        checkCoily(state, x, y + 1) || checkCoily(state, x, y + 2) ||
+        checkCoily(state, x + 1, y - 1) || checkCoily(state, x + 1, y) ||
+        checkCoily(state, x + 1, y + 1) || checkCoily(state, x + 2, y) ||
+        checkDangerousBalls(state, x - 2, y) ||
+        checkDangerousBalls(state, x - 1, y - 1) ||
+        checkDangerousBalls(state, x - 1, y) ||
+        checkDangerousBalls(state, x - 1, y + 1) ||
+        checkDangerousBalls(state, x, y - 2) ||
+        checkDangerousBalls(state, x, y - 1) ||
+        checkDangerousBalls(state, x, y + 1) ||
+        checkDangerousBalls(state, x + 1, y - 1) ||
+        checkDangerousBalls(state, x + 1, y) ||
+        checkGreenEnemy(state, x - 1, y) || checkGreenEnemy(state, x, y - 1) ||
+        checkGreenEnemy(state, x + 1, y) || checkGreenEnemy(state, x, y + 1);
+}
+
+int encodeDangerousEnemies(const StateType& state, int x, int y)
+{
+    int result = 0;
     if (checkDangerousEnemy(state, x - 2, y))
         result |= 1 << 0;
     if (checkDangerousEnemy(state, x - 1, y - 1))
@@ -104,53 +169,141 @@ int encodeEnemyState(
     if (checkDangerousEnemy(state, x + 2, y))
         result |= 1 << 11;
 
-    if (checkGreenEnemy(state, x - 1, y))
-        result |= 1 << 12;
-    if (checkGreenEnemy(state, x, y - 1))
-        result |= 1 << 13;
-    if (checkGreenEnemy(state, x + 1, y))
-        result |= 1 << 14;
-    if (checkGreenEnemy(state, x, y + 1))
-        result |= 1 << 15;
-
-    if (checkDisc(state, x - 2, y))
-        result |= 1 << 16;
-    if (checkDisc(state, x - 1, y - 1))
-        result |= 1 << 17;
-    if (checkDisc(state, x - 1, y))
-        result |= 1 << 18;
-    if (checkDisc(state, x - 1, y + 1))
-        result |= 1 << 19;
-    if (checkDisc(state, x, y - 2))
-        result |= 1 << 20;
-    if (checkDisc(state, x, y - 1))
-        result |= 1 << 21;
-    if (checkDisc(state, x + 1, y - 1))
-        result |= 1 << 22;
-
-    result |= countMoves(state, x, y) << 23;
-    result |= ((x + 1) >> 1) << 27;
-    result |= ((y + 1) >> 1) << 29;
-
-    return result;
+    int first = 0;
+    int second = 0;
+    for (int i = 0; i < 12; ++i)
+    {
+        if (((result >> i) & 0x01) != 0)
+        {
+            if (first == 0)
+                first = i + 1;
+            else
+                second = i;
+        }
+    }
+    return first * 12 + second;
 }
 
-bool hasEnemiesNearby(const StateType& state, int x, int y)
+int encodeCoily(const StateType& state, int x, int y)
 {
-    return checkDangerousEnemy(state, x - 2, y) ||
-        checkDangerousEnemy(state, x - 1, y - 1) ||
-        checkDangerousEnemy(state, x - 1, y) ||
-        checkDangerousEnemy(state, x - 1, y + 1) ||
-        checkDangerousEnemy(state, x, y - 2) ||
-        checkDangerousEnemy(state, x, y - 1) ||
-        checkDangerousEnemy(state, x, y + 1) ||
-        checkDangerousEnemy(state, x, y + 2) ||
-        checkDangerousEnemy(state, x + 1, y - 1) ||
-        checkDangerousEnemy(state, x + 1, y) ||
-        checkDangerousEnemy(state, x + 1, y + 1) ||
-        checkDangerousEnemy(state, x + 2, y) ||
-        checkGreenEnemy(state, x - 1, y) || checkGreenEnemy(state, x, y - 1) ||
-        checkGreenEnemy(state, x + 1, y) || checkGreenEnemy(state, x, y + 1);
+    int result = 0;
+    if (checkCoily(state, x - 2, y))
+        result |= 1 << 0;
+    if (checkCoily(state, x - 1, y - 1))
+        result |= 1 << 1;
+    if (checkCoily(state, x - 1, y))
+        result |= 1 << 2;
+    if (checkCoily(state, x - 1, y + 1))
+        result |= 1 << 3;
+    if (checkCoily(state, x, y - 2))
+        result |= 1 << 4;
+    if (checkCoily(state, x, y - 1))
+        result |= 1 << 5;
+    if (checkCoily(state, x, y + 1))
+        result |= 1 << 6;
+    if (checkCoily(state, x, y + 2))
+        result |= 1 << 7;
+    if (checkCoily(state, x + 1, y - 1))
+        result |= 1 << 8;
+    if (checkCoily(state, x + 1, y))
+        result |= 1 << 9;
+    if (checkCoily(state, x + 1, y + 1))
+        result |= 1 << 10;
+    if (checkCoily(state, x + 2, y))
+        result |= 1 << 11;
+
+    for (int i = 0; i < 12; ++i)
+        if (((result >> i) & 0x01) != 0)
+            return i + 1;
+    return 0;
+}
+
+int encodeDangerousBalls(const StateType& state, int x, int y)
+{
+    int result = 0;
+    if (checkDangerousBalls(state, x - 2, y))
+        result |= 1 << 0;
+    if (checkDangerousBalls(state, x - 1, y - 1))
+        result |= 1 << 1;
+    if (checkDangerousBalls(state, x - 1, y))
+        result |= 1 << 2;
+    if (checkDangerousBalls(state, x - 1, y + 1))
+        result |= 1 << 3;
+    if (checkDangerousBalls(state, x, y - 2))
+        result |= 1 << 4;
+    if (checkDangerousBalls(state, x, y - 1))
+        result |= 1 << 5;
+    if (checkDangerousBalls(state, x, y + 1))
+        result |= 1 << 6;
+    if (checkDangerousBalls(state, x + 1, y - 1))
+        result |= 1 << 7;
+    if (checkDangerousBalls(state, x + 1, y))
+        result |= 1 << 8;
+
+    int first = 0;
+    int second = 0;
+    for (int i = 0; i < 9; ++i)
+    {
+        if (((result >> i) & 0x01) != 0)
+        {
+            if (first == 0)
+                first = i + 1;
+            else
+                second = i;
+        }
+    }
+    return first * 9 + second;
+}
+
+int encodeGreenEnemies(const StateType& state, int x, int y)
+{
+    int result = 0;
+    if (checkGreenEnemy(state, x - 1, y))
+        result |= 1 << 0;
+    if (checkGreenEnemy(state, x, y - 1))
+        result |= 1 << 1;
+    if (checkGreenEnemy(state, x, y + 1))
+        result |= 1 << 2;
+    if (checkGreenEnemy(state, x + 1, y))
+        result |= 1 << 3;
+
+    int first = 0;
+    int second = 0;
+    for (int i = 0; i < 4; ++i)
+    {
+        if (((result >> i) & 0x01) != 0)
+        {
+            if (first == 0)
+                first = i + 1;
+            else
+                second = i;
+        }
+    }
+    return first * 4 + second;
+}
+
+int encodeDiscs(const StateType& state, int x, int y)
+{
+    int result = 0;
+    if (checkDisc(state, x - 2, y))
+        result |= 1 << 0;
+    if (checkDisc(state, x - 1, y - 1))
+        result |= 1 << 1;
+    if (checkDisc(state, x - 1, y))
+        result |= 1 << 2;
+    if (checkDisc(state, x - 1, y + 1))
+        result |= 1 << 3;
+    if (checkDisc(state, x, y - 2))
+        result |= 1 << 4;
+    if (checkDisc(state, x, y - 1))
+        result |= 1 << 5;
+    if (checkDisc(state, x + 1, y - 1))
+        result |= 1 << 6;
+
+    for (int i = 0; i < 7; ++i)
+        if (((result >> i) & 0x01) != 0)
+            return i + 1;
+    return 0;
 }
 
 bool checkDangerousEnemy(const StateType& state, int x, int y)
@@ -158,6 +311,21 @@ bool checkDangerousEnemy(const StateType& state, int x, int y)
     if (x < 0 || x >= 8 || y < 0 || y >= 8)
         return false;
     return isDangerousEnemy(state.first[x][y]);
+}
+
+bool checkCoily(const StateType& state, int x, int y)
+{
+    if (x < 0 || x >= 8 || y < 0 || y >= 8)
+        return false;
+    return state.first[x][y] == GameEntity::Coily;
+}
+
+bool checkDangerousBalls(const StateType& state, int x, int y)
+{
+    if (x < 0 || x >= 8 || y < 0 || y >= 8)
+        return false;
+    return state.first[x][y] == GameEntity::PurpleEnemy ||
+        state.first[x][y] == GameEntity::RedEnemy;
 }
 
 bool checkGreenEnemy(const StateType& state, int x, int y)
