@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "agent.h"
 #include "learner.h"
 #include "state-encoding.h"
@@ -11,13 +13,18 @@ namespace Qbert {
 // for dealing with block puzzle solving, and the other with avoiding enemies.
 class SubsumptionAgent2 : public Agent
 {
-    Learner blockSolver{"s2-block-solver", encodeBlockState};
-    Learner enemyAvoider{"s2-enemy-avoider", encodeEnemyStateWithSeparateCoily};
+    Learner blockSolver;
+    Learner enemyAvoider;
     bool enemyAvoiderActionTaken{false};
 
 public:
-    // Contructs an agent with a reference to the current ALE instance.
-    SubsumptionAgent2(ALEInterface& ale);
+    // Contructs an agent with a reference to the current ALE instance, the
+    // given name, and the given state encoding functions.
+    SubsumptionAgent2(
+        ALEInterface& ale,
+        const std::string& name,
+        StateEncoding encodeBlockState,
+        StateEncoding encodeEnemyState);
 
     virtual ~SubsumptionAgent2() = default;
 

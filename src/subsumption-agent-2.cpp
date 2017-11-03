@@ -2,7 +2,14 @@
 
 namespace Qbert {
 
-SubsumptionAgent2::SubsumptionAgent2(ALEInterface& ale) : Agent{ale}
+SubsumptionAgent2::SubsumptionAgent2(
+    ALEInterface& ale,
+    const std::string& name,
+    StateEncoding encodeBlockState,
+    StateEncoding encodeEnemyState)
+    : Agent{ale},
+      blockSolver{name + "-block-solver", encodeBlockState},
+      enemyAvoider{name + "-enemy-avoider", encodeEnemyState}
 {
 }
 

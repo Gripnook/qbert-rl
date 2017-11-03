@@ -11,6 +11,7 @@
 #include "image-processor.h"
 #include "game-entity.h"
 #include "subsumption-agent-2.h"
+#include "state-encoding.h"
 
 using namespace Qbert;
 
@@ -32,7 +33,10 @@ int main(int argc, char** argv)
 #endif
     ale.loadROM(argv[1]);
 
-    SubsumptionAgent2 agent{ale};
+    SubsumptionAgent2 agent{ale,
+                            "s2-coil",
+                            encodeBlockState,
+                            encodeEnemyStateWithSeparateCoily};
 
     std::ofstream os{"results/scores.csv"};
     os << "Episode,Score,Random" << std::endl;
