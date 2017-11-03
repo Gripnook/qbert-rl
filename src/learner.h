@@ -62,10 +62,10 @@ public:
         Color goalColor,
         int level);
 
-    // Notify this learner that its suggested action was taken.
+    // Notifies this learner that its suggested action was taken.
     void notifyActionTaken();
 
-    // Reset the learner after a game over.
+    // Resets the learner after a game over.
     void reset();
 
     float getRandomActionCount();
