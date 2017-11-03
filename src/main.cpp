@@ -10,6 +10,7 @@
 
 #include "image-processor.h"
 #include "game-entity.h"
+#include "monolithic-agent.h"
 #include "subsumption-agent-2.h"
 #include "state-encoding.h"
 
