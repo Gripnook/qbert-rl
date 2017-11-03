@@ -2,13 +2,21 @@
 
 #include <vector>
 #include <unordered_map>
+#include <cmath>
 
 namespace Qbert {
 
+// Screen dimensions for which the x and y coordinates were measured.
+
+static constexpr float width = 320;
+static constexpr float height = 210;
+
+// Locations of the rectangles that are used to grab the block color and entity
+// color information. Each position pair corresponds to an absolute position in
+// the image, and the start variables are relative to that fixed point.
+
 static constexpr int numBlocks = 21;
 
-static constexpr int width = 320;
-static constexpr int height = 210;
 static constexpr int xPositions[]{136, 112, 168, 88,  136, 192, 64,
                                   112, 168, 216, 40,  88,  136, 192,
                                   240, 16,  64,  112, 168, 216, 264};
@@ -29,6 +37,10 @@ static constexpr int yEntitySize = 24;
 static constexpr int xEntityStart = 16;
 static constexpr int yEntityStart = -26;
 
+// Locations of the rectangles that are used to grab the disc locations. Each
+// position pair corresponds to an absolute position in the image, and the start
+// variables are relative to that fixed point.
+
 static constexpr int numDiscs = 5;
 
 static constexpr int xDiscPositions[]{176, 232, 280, 72, 24};
@@ -46,26 +58,47 @@ static constexpr int yDiscSize = 2;
 static constexpr int xDiscStart = 0;
 static constexpr int yDiscStart = -10;
 
+// Location of the rectangle that is used to grab the goal color information
+// from the score display. The start position corresponds to an absolute
+// position in the image.
+
 static constexpr int xGoalSize = 10;
 static constexpr int yGoalSize = 7;
 static constexpr int xGoalStart = 68;
 static constexpr int yGoalStart = 6;
+
+// Location of the rectangle that is used to grab the background color in the
+// image. The start position corresponds to an absolute position in the image.
 
 static constexpr int xBackgroundSize = 8;
 static constexpr int yBackgroundSize = 16;
 static constexpr int xBackgroundStart = 0;
 static constexpr int yBackgroundStart = 0;
 
+// Extracts the game entities and block colors from the screen and returns them
+// in vectors indexed in a way that traverses the pyramid from the top-down and
+// from left to right.
 std::pair<std::vector<GameEntity>, std::vector<Color>>
     extractFeatures(const ALEScreen& screen);
 
+// Is this Qbert's color?
 bool isQbert(const Color& color);
+
+// Is this a purple enemy's color?
 bool isPurpleEnemy(const Color& color);
+
+// Is this a green enemy's color?
 bool isGreenEnemy(const Color& color);
 
+// Replaces the voids that have discs with discs.
 void addDiscs(Grid<GameEntity>& entities, const ALEScreen& screen);
 
+// Extracts the background color from the screen.
 Color getBackground(const ALEScreen& screen);
+
+// Extracts a map of colors to number of pixels with those colors within a given
+// rectangle. This function also filters out the background color given, as well
+// as the color black (0x00).
 std::unordered_map<Color, int> getColorCounts(
     const ALEScreen& screen,
     int rowBegin,
@@ -73,13 +106,21 @@ std::unordered_map<Color, int> getColorCounts(
     int colBegin,
     int colEnd,
     Color background);
+
+// Extracts a map of colors to number of pixels with those colors within a given
+// rectangle.
 std::unordered_map<Color, int> getColorCounts(
     const ALEScreen& screen,
     int rowBegin,
     int rowEnd,
     int colBegin,
     int colEnd);
+
+// Returns the color that has the greatest count in the given map.
 Color getMaxColor(const std::unordered_map<Color, int>& counts);
+
+// Rounds the argument to the nearest integer.
+int round(float arg);
 
 StateType getState(const ALEScreen& screen)
 {
@@ -109,11 +150,12 @@ std::pair<std::vector<GameEntity>, std::vector<Color>>
     std::vector<GameEntity> entities;
     std::vector<Color> colors;
 
-    int xScale = width / screen.width();
-    int yScale = height / screen.height();
+    auto xScale = width / screen.width();
+    auto yScale = height / screen.height();
 
     Color background = getBackground(screen);
 
+    // Extracts the game entities.
     for (int i = 0; i < numBlocks; ++i)
     {
         int x0 = xPositions[i] + xEntityStart;
@@ -122,10 +164,10 @@ std::pair<std::vector<GameEntity>, std::vector<Color>>
         int y1 = y0 + yEntitySize;
         auto counts = getColorCounts(
             screen,
-            y0 / yScale,
-            y1 / yScale,
-            x0 / xScale,
-            x1 / xScale,
+            round(y0 / yScale),
+            round(y1 / yScale),
+            round(x0 / xScale),
+            round(x1 / xScale),
             background);
         Color maxColor = getMaxColor(counts);
         if (counts.empty())
@@ -140,6 +182,7 @@ std::pair<std::vector<GameEntity>, std::vector<Color>>
             entities.push_back(GameEntity::RedEnemy);
     }
 
+    // Extracts the block colors.
     for (int i = 0; i < numBlocks; ++i)
     {
         int x0 = xPositions[i] + xBlockStart;
@@ -148,10 +191,10 @@ std::pair<std::vector<GameEntity>, std::vector<Color>>
         int y1 = y0 + yBlockSize;
         auto counts = getColorCounts(
             screen,
-            y0 / yScale,
-            y1 / yScale,
-            x0 / xScale,
-            x1 / xScale,
+            round(y0 / yScale),
+            round(y1 / yScale),
+            round(x0 / xScale),
+            round(x1 / xScale),
             background);
         Color maxColor = getMaxColor(counts);
         colors.push_back(maxColor);
@@ -177,8 +220,8 @@ bool isGreenEnemy(const Color& color)
 
 void addDiscs(Grid<GameEntity>& entities, const ALEScreen& screen)
 {
-    int xScale = width / screen.width();
-    int yScale = height / screen.height();
+    auto xScale = width / screen.width();
+    auto yScale = height / screen.height();
 
     for (int i = 0; i < numDiscs; ++i)
     {
@@ -187,7 +230,11 @@ void addDiscs(Grid<GameEntity>& entities, const ALEScreen& screen)
         int y0 = yDiscPositions[i] + yDiscStart;
         int y1 = y0 + yDiscSize;
         auto counts = getColorCounts(
-            screen, y0 / yScale, y1 / yScale, x0 / xScale, x1 / xScale);
+            screen,
+            round(y0 / yScale),
+            round(y1 / yScale),
+            round(x0 / xScale),
+            round(x1 / xScale));
 
         // Discs have uniform, non-black coloring.
         if (counts.size() == 1 && counts.count(0) == 0)
@@ -197,35 +244,37 @@ void addDiscs(Grid<GameEntity>& entities, const ALEScreen& screen)
 
 Color getGoalColor(const ALEScreen& screen)
 {
-    int xScale = width / screen.width();
-    int yScale = height / screen.height();
+    auto xScale = width / screen.width();
+    auto yScale = height / screen.height();
 
     Color background = getBackground(screen);
 
     auto counts = getColorCounts(
         screen,
-        yGoalStart / yScale,
-        (yGoalStart + yGoalSize) / yScale,
-        xGoalStart / xScale,
-        (xGoalStart + xGoalSize) / xScale,
+        round(yGoalStart / yScale),
+        round((yGoalStart + yGoalSize) / yScale),
+        round(xGoalStart / xScale),
+        round((xGoalStart + xGoalSize) / xScale),
         background);
 
+    // If it's all background, then the goal color isn't displayed.
     return counts.empty() ? 0 : getMaxColor(counts);
 }
 
 Color getBackground(const ALEScreen& screen)
 {
-    int xScale = width / screen.width();
-    int yScale = height / screen.height();
+    auto xScale = width / screen.width();
+    auto yScale = height / screen.height();
 
     auto counts = getColorCounts(
         screen,
-        yBackgroundStart / yScale,
-        (yBackgroundStart + yBackgroundSize) / yScale,
-        xBackgroundStart / xScale,
-        (xBackgroundStart + xBackgroundSize) / xScale,
+        round(yBackgroundStart / yScale),
+        round((yBackgroundStart + yBackgroundSize) / yScale),
+        round(xBackgroundStart / xScale),
+        round((xBackgroundStart + xBackgroundSize) / xScale),
         0);
 
+    // If it's all black, then the background is black.
     return counts.empty() ? 0 : getMaxColor(counts);
 }
 
@@ -237,16 +286,9 @@ std::unordered_map<Color, int> getColorCounts(
     int colEnd,
     Color background)
 {
-    std::unordered_map<Color, int> counts;
-    for (int r = rowBegin; r < rowEnd; ++r)
-    {
-        for (int c = colBegin; c < colEnd; ++c)
-        {
-            Color color = screen.get(r, c);
-            if (color != background && color != 0)
-                ++counts[color];
-        }
-    }
+    auto counts = getColorCounts(screen, rowBegin, rowEnd, colBegin, colEnd);
+    counts.erase(0);
+    counts.erase(background);
     return counts;
 }
 
@@ -278,5 +320,10 @@ Color getMaxColor(const std::unordered_map<Color, int>& counts)
         }
     }
     return maxColor;
+}
+
+int round(float arg)
+{
+    return static_cast<int>(std::round(arg));
 }
 }
