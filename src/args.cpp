@@ -54,7 +54,7 @@ Args parseArgs(int argc, char** argv)
             args.explorationPolicy =
                 parseExplorationPolicy(argv[i], i, argc, argv);
         }
-        if (arg == "-h" || arg == "--help")
+        else if (arg == "-h" || arg == "--help")
         {
             args.help = true;
         }
