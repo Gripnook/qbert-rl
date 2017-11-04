@@ -52,6 +52,17 @@ int encodeEnemyStateWithSeparateCoily(
     Color goalColor,
     int level);
 
+// A separate state encoding that only looks at the game entities. This function
+// separates Coily from the other enemies in the encoding. This version checks
+// for Coily at a distance of 3 or less from the player.
+int encodeEnemyStateWithSeparateCoilyV2(
+    const StateType& state,
+    int x,
+    int y,
+    Color startColor,
+    Color goalColor,
+    int level);
+
 // Checks if any dangerous enemies are at a distance of 2 or less from the
 // player, or if any green enemies are at a distance of 1 from the player.
 bool hasEnemiesNearby(const StateType& state, int x, int y);
@@ -61,4 +72,10 @@ bool hasEnemiesNearby(const StateType& state, int x, int y);
 // there in a single move, or if any green enemies are at a distance of 1 from
 // the player.
 bool hasEnemiesNearbyWithSeparateCoily(const StateType& state, int x, int y);
+
+// Checks if Coily is at a distance of 3 or less from the player, or if any
+// other dangerous enemies are at a distance of 1 from the player or could get
+// there in a single move, or if any green enemies are at a distance of 1 from
+// the player.
+bool hasEnemiesNearbyWithSeparateCoilyV2(const StateType& state, int x, int y);
 }

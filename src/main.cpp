@@ -106,6 +106,14 @@ std::unique_ptr<Agent> createAgent(ALEInterface& ale, const Args& args)
             encodeEnemyStateWithSeparateCoily,
             hasEnemiesNearbyWithSeparateCoily,
             args.explorationPolicy.second);
+    else if (args.learner == "subsumption-v3")
+        return std::make_unique<SubsumptionAgent2>(
+            ale,
+            args.learner + "-" + args.explorationPolicy.first,
+            encodeBlockState,
+            encodeEnemyStateWithSeparateCoilyV2,
+            hasEnemiesNearbyWithSeparateCoilyV2,
+            args.explorationPolicy.second);
     else
         throw ArgsError{"invalid learner"};
 }

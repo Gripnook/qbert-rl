@@ -155,6 +155,12 @@ void printUsage(const char* progname)
         << std::endl;
     std::cerr << "                is encoded separately from the other enemies."
               << std::endl;
+    std::cerr
+        << "            subsumption-v3 - Same as subsumption-v2, but Coily"
+        << std::endl;
+    std::cerr
+        << "                is encoded at a greater distance from the player."
+        << std::endl;
     std::cerr << "        Defaults to " << args.learner << "." << std::endl;
     std::cerr << std::endl;
     std::cerr << "    -e <exploration_policy>" << std::endl;
