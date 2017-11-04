@@ -1,6 +1,5 @@
 #pragma once
 
-#include <set>
 #include <string>
 #include <utility>
 #include <stdexcept>
@@ -9,15 +8,13 @@
 
 namespace Qbert {
 
-const std::set<std::string> learners = {"monolithic", "subsumption"};
-
 struct Args
 {
     std::string rom{"qbert.bin"};
     int randomSeed{123};
     bool displayScreen{false};
 
-    std::string learner{"subsumption"};
+    std::string learner{"subsumption-v2"};
     std::pair<std::string, ExplorationPolicy> explorationPolicy{
         "inverse_proportional", ExploreInverseProportional{}};
 

@@ -4,21 +4,50 @@
 
 namespace Qbert {
 
+// Encodes dangerous enemies at a distance of 2 or less from the player
+// in an 8-bit encoding.
 int encodeDangerousEnemies(const StateType& state, int x, int y);
+
+// Encodes Coily's presence at a distance of 2 or less from the player
+// in a 4-bit encoding.
 int encodeCoily(const StateType& state, int x, int y);
+
+// Encodes dangerous balls that are at a distance of 1 from the player, or could
+// get there in a single move, in a 7-bit encoding.
 int encodeDangerousBalls(const StateType& state, int x, int y);
+
+// Encodes green enemies at a distance of 1 from the player
+// in a 5-bit encoding.
 int encodeGreenEnemies(const StateType& state, int x, int y);
+
+// Encodes discs at a distance of 2 or less from the player
+// in a 3-bit encoding.
 int encodeDiscs(const StateType& state, int x, int y);
 
+// Checks if there is a dangerous enemy at position (x, y).
 bool checkDangerousEnemy(const StateType& state, int x, int y);
+
+// Checks if Coily is at position (x, y).
 bool checkCoily(const StateType& state, int x, int y);
+
+// Checks if there is a dangerous ball at position (x, y).
 bool checkDangerousBalls(const StateType& state, int x, int y);
+
+// Checks if there is a green enemy at position (x, y).
 bool checkGreenEnemy(const StateType& state, int x, int y);
+
+// Checks if there is a disc at position (x, y).
 bool checkDisc(const StateType& state, int x, int y);
+
+// Checks if there is a void at position (x, y).
 bool checkVoid(const StateType& state, int x, int y);
 
+// Encodes the color of the block at position (x, y) in a 2-bit encoding.
 int encodeColor(
     const StateType& state, int x, int y, Color startColor, Color goalColor);
+
+// Encodes a count of the blocks in the rectangle defined by
+// (x0, y0) and (x1, y1) in a 3-bit encoding.
 int encodeCount(
     const StateType& state,
     int x0,
@@ -28,8 +57,13 @@ int encodeCount(
     Color startColor,
     Color goalColor);
 
+// Counts the number of blocks with the given color in the rectangle
+// defined by (x0, y0) and (x1, y1).
 int countColor(
     const StateType& state, int x0, int x1, int y0, int y1, Color color);
+
+// Counts the number of blocks with an intermediate color in the rectangle
+// defined by (x0, y0) and (x1, y1).
 int countIntermediateColor(
     const StateType& state,
     int x0,
@@ -38,9 +72,45 @@ int countIntermediateColor(
     int y1,
     Color startColor,
     Color goalColor);
+
+// Checks if the block at position (x, y) has the given color.
 bool checkColor(const StateType& state, int x, int y, Color color);
 
+// Counts the number of moves the player can take in the given position.
+// Returns a 4-bit encoding.
 int countMoves(const StateType& state, int x, int y);
+
+int encodeState(
+    const StateType& state,
+    int x,
+    int y,
+    Color startColor,
+    Color goalColor,
+    int /*level*/)
+{
+    int result = 0;
+
+    // We haven't yet found out the colors, so we return a special state.
+    if (startColor == 0 || goalColor == 0)
+        return 0;
+
+    result |= 1 << 0;
+    result |= encodeColor(state, x, y, startColor, goalColor) << 1;
+    result |= encodeColor(state, x - 1, y, startColor, goalColor) << 3;
+    result |= encodeColor(state, x, y - 1, startColor, goalColor) << 5;
+    result |= encodeColor(state, x + 1, y, startColor, goalColor) << 7;
+    result |= encodeColor(state, x, y + 1, startColor, goalColor) << 9;
+    if (checkDisc(state, x - 1, y))
+        result |= encodeColor(state, 1, 1, startColor, goalColor) << 3;
+    if (checkDisc(state, x, y - 1))
+        result |= encodeColor(state, 1, 1, startColor, goalColor) << 5;
+
+    result |= encodeDangerousEnemies(state, x, y) << 11;
+    result |= encodeGreenEnemies(state, x, y) << 19;
+    result |= encodeDiscs(state, x, y) << 24;
+
+    return result;
+}
 
 int encodeBlockState(
     const StateType& state,
@@ -122,6 +192,24 @@ int encodeEnemyStateWithSeparateCoily(
 
 bool hasEnemiesNearby(const StateType& state, int x, int y)
 {
+    return checkDangerousEnemy(state, x - 2, y) ||
+        checkDangerousEnemy(state, x - 1, y - 1) ||
+        checkDangerousEnemy(state, x - 1, y) ||
+        checkDangerousEnemy(state, x - 1, y + 1) ||
+        checkDangerousEnemy(state, x, y - 2) ||
+        checkDangerousEnemy(state, x, y - 1) ||
+        checkDangerousEnemy(state, x, y + 1) ||
+        checkDangerousEnemy(state, x, y + 2) ||
+        checkDangerousEnemy(state, x + 1, y - 1) ||
+        checkDangerousEnemy(state, x + 1, y) ||
+        checkDangerousEnemy(state, x + 1, y + 1) ||
+        checkDangerousEnemy(state, x + 2, y) ||
+        checkGreenEnemy(state, x - 1, y) || checkGreenEnemy(state, x, y - 1) ||
+        checkGreenEnemy(state, x + 1, y) || checkGreenEnemy(state, x, y + 1);
+}
+
+bool hasEnemiesNearbyWithSeparateCoily(const StateType& state, int x, int y)
+{
     return checkCoily(state, x - 2, y) || checkCoily(state, x - 1, y - 1) ||
         checkCoily(state, x - 1, y) || checkCoily(state, x - 1, y + 1) ||
         checkCoily(state, x, y - 2) || checkCoily(state, x, y - 1) ||
@@ -169,6 +257,7 @@ int encodeDangerousEnemies(const StateType& state, int x, int y)
     if (checkDangerousEnemy(state, x + 2, y))
         result |= 1 << 11;
 
+    // There can only be two dangerous enemies in the game at a time.
     int first = 0;
     int second = 0;
     for (int i = 0; i < 12; ++i)
@@ -212,6 +301,7 @@ int encodeCoily(const StateType& state, int x, int y)
     if (checkCoily(state, x + 2, y))
         result |= 1 << 11;
 
+    // There can only be one instance of Coily in the game at a time.
     for (int i = 0; i < 12; ++i)
         if (((result >> i) & 0x01) != 0)
             return i + 1;
@@ -240,6 +330,7 @@ int encodeDangerousBalls(const StateType& state, int x, int y)
     if (checkDangerousBalls(state, x + 1, y))
         result |= 1 << 8;
 
+    // There can only be two dangerous balls in the game at a time.
     int first = 0;
     int second = 0;
     for (int i = 0; i < 9; ++i)
@@ -267,6 +358,7 @@ int encodeGreenEnemies(const StateType& state, int x, int y)
     if (checkGreenEnemy(state, x + 1, y))
         result |= 1 << 3;
 
+    // There can only be two green enemies in the game at a time.
     int first = 0;
     int second = 0;
     for (int i = 0; i < 4; ++i)
@@ -300,6 +392,7 @@ int encodeDiscs(const StateType& state, int x, int y)
     if (checkDisc(state, x + 1, y - 1))
         result |= 1 << 6;
 
+    // There can only be one disc in the given positions at a time.
     for (int i = 0; i < 7; ++i)
         if (((result >> i) & 0x01) != 0)
             return i + 1;

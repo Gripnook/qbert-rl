@@ -9,6 +9,10 @@
 
 namespace Qbert {
 
+// A function that defines when to suppress the block puzzle solver.
+using SubsumptionSupression =
+    std::function<bool(const StateType& state, int x, int y)>;
+
 // A class that implements a learning agent that uses a subsumption architecture
 // to divide the model into two learners. One of these learners is responsible
 // for dealing with block puzzle solving, and the other with avoiding enemies.
@@ -17,16 +21,18 @@ class SubsumptionAgent2 : public Agent
     Learner blockSolver;
     Learner enemyAvoider;
     bool enemyAvoiderActionTaken{false};
+    SubsumptionSupression suppress;
 
 public:
     // Contructs an agent with a reference to the current ALE instance, the
-    // given name, the given state encoding functions, and the given
-    // exploration policy.
+    // given name, the given state encoding functions, the given suppression
+    // function, and the given exploration policy.
     SubsumptionAgent2(
         ALEInterface& ale,
         const std::string& name,
         StateEncoding encodeBlockState,
         StateEncoding encodeEnemyState,
+        SubsumptionSupression suppress,
         ExplorationPolicy explore);
 
     virtual ~SubsumptionAgent2() = default;

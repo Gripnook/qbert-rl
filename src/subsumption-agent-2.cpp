@@ -7,10 +7,12 @@ SubsumptionAgent2::SubsumptionAgent2(
     const std::string& name,
     StateEncoding encodeBlockState,
     StateEncoding encodeEnemyState,
+    SubsumptionSupression suppress,
     ExplorationPolicy explore)
     : Agent{ale},
       blockSolver{name + "-block-solver", encodeBlockState, explore},
-      enemyAvoider{name + "-enemy-avoider", encodeEnemyState, explore}
+      enemyAvoider{name + "-enemy-avoider", encodeEnemyState, explore},
+      suppress{suppress}
 {
 }
 
@@ -87,9 +89,7 @@ Action SubsumptionAgent2::getAction(
     Color goalColor,
     int level)
 {
-    // We use the presence of enemies to suppress the block solver and focus on
-    // enemy avoidance.
-    if (hasEnemiesNearby(state, position.first, position.second))
+    if (suppress(state, position.first, position.second))
     {
         enemyAvoiderActionTaken = true;
         return enemyAvoider.getAction(

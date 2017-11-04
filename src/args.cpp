@@ -134,8 +134,23 @@ void printUsage(const char* progname)
     std::cerr << "    --learner <learner>" << std::endl;
     std::cerr << "        Sets the learner used for the game." << std::endl;
     std::cerr << "        The possible options are:" << std::endl;
-    for (const auto& learner : learners)
-        std::cerr << "            " << learner << std::endl;
+    std::cerr
+        << "            monolithic - A monolithic learner that uses a unified"
+        << std::endl;
+    std::cerr
+        << "                state representation for block colors and enemies."
+        << std::endl;
+    std::cerr << "            subsumption-v1 - A learner with a subsumption"
+              << std::endl;
+    std::cerr
+        << "                architecture that splits the state representation"
+        << std::endl;
+    std::cerr << "                for block colors and enemies." << std::endl;
+    std::cerr
+        << "            subsumption-v2 - Same as subsumption-v1, but Coily"
+        << std::endl;
+    std::cerr << "                is encoded separately from the other enemies."
+              << std::endl;
     std::cerr << "        Defaults to " << args.learner << "." << std::endl;
     std::cerr << std::endl;
     std::cerr << "    -e <exploration_policy>" << std::endl;
@@ -143,9 +158,22 @@ void printUsage(const char* progname)
     std::cerr << "        Sets the exploration policy used by the learner."
               << std::endl;
     std::cerr << "        The possible options are:" << std::endl;
-    std::cerr << "            inverse_proportional" << std::endl;
-    std::cerr << "            epsilon_greedy <epsilon>" << std::endl;
-    std::cerr << "            threshold <threshold>" << std::endl;
+    std::cerr
+        << "            inverse_proportional - Selects a random action with"
+        << std::endl;
+    std::cerr
+        << "                probability 1/(N+1) for a state visited N times."
+        << std::endl;
+    std::cerr
+        << "            epsilon_greedy <epsilon> - Selects a random action"
+        << std::endl;
+    std::cerr << "                with probability epsilon." << std::endl;
+    std::cerr
+        << "            threshold <threshold> - Selects a random action if a"
+        << std::endl;
+    std::cerr
+        << "                state is visited less times than the threshold."
+        << std::endl;
     std::cerr << "        Defaults to " << args.explorationPolicy.first << "."
               << std::endl;
     std::cerr << std::endl;
