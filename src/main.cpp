@@ -1,13 +1,12 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <memory>
 
 #include <ale/ale_interface.hpp>
-
-#ifdef USE_SDL
 #include <SDL/SDL.h>
-#endif
 
+#include "args.h"
 #include "image-processor.h"
 #include "game-entity.h"
 #include "monolithic-agent.h"
@@ -17,31 +16,51 @@
 
 using namespace Qbert;
 
+void learn(const Args& args);
+std::unique_ptr<Agent> createAgent(ALEInterface& ale, const Args& args);
 void print(const StateType& state);
 
 int main(int argc, char** argv)
 {
-    if (argc < 2)
+    try
     {
-        std::cerr << "Usage: " << argv[0] << " rom_file" << std::endl;
+        auto args = parseArgs(argc, argv);
+        if (args.help)
+            printUsage(argv[0]);
+        else
+            learn(args);
+        return 0;
+    }
+    catch (ArgsError& e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+        printUsage(argv[0]);
         return 1;
     }
+    catch (std::exception& e)
+    {
+        std::cerr << "Error: " << e.what() << std::endl;
+        return 2;
+    }
+    catch (...)
+    {
+        return 3;
+    }
+}
 
+void learn(const Args& args)
+{
     ALEInterface ale;
-    ale.setInt("random_seed", 123);
-#ifdef USE_SDL
-    ale.setBool("display_screen", true);
-    ale.setBool("sound", true);
-#endif
-    ale.loadROM(argv[1]);
+    ale.setInt("random_seed", args.randomSeed);
+    ale.setBool("display_screen", args.displayScreen);
+    ale.setBool("sound", args.displayScreen);
+    ale.setFloat("repeat_action_probability", 0.0f);
+    ale.loadROM(args.rom);
 
-    SubsumptionAgent2 agent{ale,
-                            "s2-coil",
-                            encodeBlockState,
-                            encodeEnemyStateWithSeparateCoily,
-                            ExploreInverseProportional{}};
+    auto agent = createAgent(ale, args);
 
-    std::ofstream os{"results/scores.csv"};
+    std::ofstream os{"results/scores." + args.learner + "." +
+                     args.explorationPolicy.first + ".csv"};
     os << "Episode,Score,Random" << std::endl;
     int episode = 0;
     while (true)
@@ -49,23 +68,44 @@ int main(int argc, char** argv)
         ++episode;
         while (!ale.game_over())
         {
-            // auto state = getState(ale.getScreen());
-            // std::cout << "High Score: " << agent.getHighScore() << std::endl;
-            // print(state);
-            agent.updateState();
+            if (args.debug && ale.getEpisodeFrameNumber() % 20 == 0)
+            {
+                auto state = getState(ale.getScreen());
+                std::cout << "High Score: " << agent->getHighScore()
+                          << std::endl;
+                print(state);
+            }
+            agent->updateState();
         }
-        os << episode << "," << agent.getScore() << ","
-           << agent.getRandomFraction() << std::endl;
+        os << episode << "," << agent->getScore() << ","
+           << agent->getRandomFraction() << std::endl;
         ale.reset_game();
-        agent.resetGame();
+        agent->resetGame();
     }
+}
 
-    return 0;
+std::unique_ptr<Agent> createAgent(ALEInterface& ale, const Args& args)
+{
+    if (args.learner == "monolithic")
+        return std::make_unique<MonolithicAgent>(
+            ale,
+            args.learner + "-" + args.explorationPolicy.first,
+            encodeEnemyState, // TODO
+            args.explorationPolicy.second);
+    else if (args.learner == "subsumption")
+        return std::make_unique<SubsumptionAgent2>(
+            ale,
+            args.learner + "-" + args.explorationPolicy.first,
+            encodeBlockState,
+            encodeEnemyStateWithSeparateCoily,
+            args.explorationPolicy.second);
+    else
+        throw ArgsError{"invalid learner"};
 }
 
 void print(const StateType& state)
 {
-    std::cout << "ENTITIES" << std::endl;
+    std::cout << "Game Entities" << std::endl;
     for (int i = 0; i < 8; ++i)
     {
         for (int j = 0; j < 8; ++j)
@@ -73,7 +113,7 @@ void print(const StateType& state)
         std::cout << std::endl;
     }
 
-    std::cout << std::endl << "BLOCK COLORS" << std::endl;
+    std::cout << std::endl << "Block Colors" << std::endl;
     for (int i = 0; i < 8; ++i)
     {
         for (int j = 0; j < 8; ++j)
