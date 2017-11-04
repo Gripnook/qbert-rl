@@ -62,6 +62,10 @@ Args parseArgs(int argc, char** argv)
         {
             args.debug = true;
         }
+        else
+        {
+            throw ArgsError{"invalid argument"};
+        }
     }
 
     return args;
