@@ -52,7 +52,7 @@ void learn(const Args& args)
     ale.setInt("random_seed", args.randomSeed);
     ale.setBool("display_screen", args.displayScreen);
     ale.setBool("sound", args.displayScreen);
-    ale.setFloat("repeat_action_probability", 0.0f);
+    // ale.setFloat("repeat_action_probability", 0.0f);
     ale.loadROM(args.rom);
 
     auto agent = createAgent(ale, args);
