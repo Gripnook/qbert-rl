@@ -22,7 +22,8 @@ public:
         ALEInterface& ale,
         const std::string& name,
         StateEncoding encodeState,
-        ExplorationPolicy explore);
+        ExplorationPolicy explore,
+        bool allowNoop = false);
 
     virtual ~MonolithicAgent() = default;
 

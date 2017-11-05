@@ -33,7 +33,8 @@ public:
         StateEncoding encodeBlockState,
         StateEncoding encodeEnemyState,
         SubsumptionSupression suppress,
-        ExplorationPolicy explore);
+        ExplorationPolicy explore,
+        bool allowNoop = false);
 
     virtual ~SubsumptionAgent2() = default;
 
