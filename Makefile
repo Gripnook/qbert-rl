@@ -18,7 +18,7 @@ LIBFLAGS := -lale
 SRCS := main.cpp args.cpp \
 	agent.cpp monolithic-agent.cpp subsumption-agent-2.cpp \
 	learner.cpp state-encoding.cpp exploration-policy.cpp \
-	image-processor.cpp game-entity.cpp
+	feature-extractor.cpp game-entity.cpp
 DIRECTORIES := 
 
 

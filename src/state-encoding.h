@@ -2,7 +2,7 @@
 
 #include <functional>
 
-#include "image-processor.h"
+#include "feature-extractor.h"
 
 namespace Qbert {
 

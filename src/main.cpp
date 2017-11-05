@@ -6,7 +6,7 @@
 #include <ale/ale_interface.hpp>
 
 #include "args.h"
-#include "image-processor.h"
+#include "feature-extractor.h"
 #include "game-entity.h"
 #include "monolithic-agent.h"
 #include "subsumption-agent-2.h"
@@ -68,7 +68,7 @@ void learn(const Args& args)
         {
             if (args.debug && ale.getEpisodeFrameNumber() % 20 == 0)
             {
-                auto state = getState(ale.getScreen());
+                auto state = getState(ale);
                 std::cout << "High Score: " << agent->getHighScore()
                           << std::endl;
                 print(state);

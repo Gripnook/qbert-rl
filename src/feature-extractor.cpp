@@ -1,4 +1,4 @@
-#include "image-processor.h"
+#include "feature-extractor.h"
 
 #include <vector>
 #include <unordered_map>
@@ -75,6 +75,12 @@ static constexpr int yBackgroundSize = 16;
 static constexpr int xBackgroundStart = 0;
 static constexpr int yBackgroundStart = 0;
 
+// Processes the image on the screen to obtain the locations of Qbert and the
+// other entities, as well as the colors of all the blocks in the game. Note
+// that this method does not distinguish between enemies with the same color,
+// such as Coily and the purple ball.
+StateType getState(const ALEScreen& screen);
+
 // Extracts the game entities and block colors from the screen and returns them
 // in vectors indexed in a way that traverses the pyramid from the top-down and
 // from left to right.
@@ -89,6 +95,9 @@ bool isPurpleEnemy(const Color& color);
 
 // Is this a green enemy's color?
 bool isGreenEnemy(const Color& color);
+
+// Replaces the generic purple enemy with Coily.
+void addCoily(StateType& state, const ALERAM& ram);
 
 // Replaces the voids that have discs with discs.
 void addDiscs(Grid<GameEntity>& entities, const ALEScreen& screen);
@@ -121,6 +130,13 @@ Color getMaxColor(const std::unordered_map<Color, int>& counts);
 
 // Rounds the argument to the nearest integer.
 int round(float arg);
+
+StateType getState(ALEInterface& ale)
+{
+    auto state = getState(ale.getScreen());
+    addCoily(state, ale.getRAM());
+    return state;
+}
 
 StateType getState(const ALEScreen& screen)
 {
@@ -216,6 +232,17 @@ bool isPurpleEnemy(const Color& color)
 bool isGreenEnemy(const Color& color)
 {
     return color == 196;
+}
+
+void addCoily(StateType& state, const ALERAM& ram)
+{
+    int xCoily = ram.get(0x27);
+    int yCoily = ram.get(0x45);
+    // Converts the diagonal position given in RAM to our coordinate system.
+    int x = (xCoily - yCoily + 5) / 2 + 1;
+    int y = (xCoily + yCoily - 5) / 2 + 1;
+    if (x >= 0 && x < 8 && y >= 0 && y < 8 && state.second[x][y] != 0)
+        state.first[x][y] = GameEntity::Coily;
 }
 
 void addDiscs(Grid<GameEntity>& entities, const ALEScreen& screen)

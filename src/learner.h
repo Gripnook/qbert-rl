@@ -7,7 +7,7 @@
 
 #include <ale/ale_interface.hpp>
 
-#include "image-processor.h"
+#include "feature-extractor.h"
 #include "state-encoding.h"
 #include "exploration-policy.h"
 

@@ -13,8 +13,7 @@ Agent::Agent(ALEInterface& ale) : ale{ale}
 void Agent::updateState()
 {
     auto screen = ale.getScreen();
-    auto state = getState(screen);
-    fixState(state);
+    auto state = getState(ale);
     update(state, screen);
 
     float currentReward = ale.act(action);
@@ -133,17 +132,5 @@ float Agent::getScore()
 float Agent::getHighScore()
 {
     return highScore;
-}
-
-void Agent::fixState(StateType& state)
-{
-    auto ram = ale.getRAM();
-    int xCoily = ram.get(0x27);
-    int yCoily = ram.get(0x45);
-    // Converts the diagonal position given in RAM to our coordinate system.
-    int x = (xCoily - yCoily + 5) / 2 + 1;
-    int y = (xCoily + yCoily - 5) / 2 + 1;
-    if (x >= 0 && x < 8 && y >= 0 && y < 8 && state.second[x][y] != 0)
-        state.first[x][y] = GameEntity::Coily;
 }
 }

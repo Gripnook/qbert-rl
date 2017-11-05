@@ -4,7 +4,7 @@
 
 #include <ale/ale_interface.hpp>
 
-#include "image-processor.h"
+#include "feature-extractor.h"
 
 namespace Qbert {
 
@@ -83,8 +83,5 @@ private:
 
     // Gets Qbert's position from the state.
     std::pair<int, int> getPlayerPosition(const StateType& state);
-
-    // Uses the RAM to find and update Coily's position.
-    void fixState(StateType& state);
 };
 }
