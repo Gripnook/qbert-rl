@@ -87,37 +87,33 @@ std::unique_ptr<Agent> createAgent(ALEInterface& ale, const Args& args)
     if (args.learner == "monolithic")
         return std::make_unique<MonolithicAgent>(
             ale,
-            args.learner + "-" + args.explorationPolicy.first + "-" + std::to_string(args.noop),
+            args.learner + "-" + args.explorationPolicy.first,
             encodeState,
-            args.explorationPolicy.second,
-            args.noop);
+            args.explorationPolicy.second);
     else if (args.learner == "subsumption-v1")
         return std::make_unique<SubsumptionAgent2>(
             ale,
-            args.learner + "-" + args.explorationPolicy.first + "-" + std::to_string(args.noop),
+            args.learner + "-" + args.explorationPolicy.first,
             encodeBlockState,
             encodeEnemyState,
             hasEnemiesNearby,
-            args.explorationPolicy.second,
-            args.noop);
+            args.explorationPolicy.second);
     else if (args.learner == "subsumption-v2")
         return std::make_unique<SubsumptionAgent2>(
             ale,
-            args.learner + "-" + args.explorationPolicy.first + "-" + std::to_string(args.noop),
+            args.learner + "-" + args.explorationPolicy.first,
             encodeBlockState,
             encodeEnemyStateWithSeparateCoily,
             hasEnemiesNearbyWithSeparateCoily,
-            args.explorationPolicy.second,
-            args.noop);
+            args.explorationPolicy.second);
     else if (args.learner == "subsumption-v3")
         return std::make_unique<SubsumptionAgent2>(
             ale,
-            args.learner + "-" + args.explorationPolicy.first + "-" + std::to_string(args.noop),
+            args.learner + "-" + args.explorationPolicy.first,
             encodeBlockState,
             encodeEnemyStateWithSeparateCoilyV2,
             hasEnemiesNearbyWithSeparateCoilyV2,
-            args.explorationPolicy.second,
-            args.noop);
+            args.explorationPolicy.second);
     else
         throw ArgsError{"invalid learner"};
 }

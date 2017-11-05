@@ -19,7 +19,6 @@ class Learner
     const std::string name;
     const StateEncoding encodeState;
     const ExplorationPolicy explore;
-    const bool allowNoop;
     const float alpha, gamma;
 
     std::unordered_map<int, std::array<float, 5>> utilities;
@@ -39,7 +38,6 @@ public:
         std::string name,
         StateEncoding encodeState,
         ExplorationPolicy explore,
-        bool allowNoop = false,
         float alpha = 0.10f,
         float gamma = 0.90f);
 

@@ -17,7 +17,6 @@ struct Args
     std::string learner{"subsumption-v2"};
     std::pair<std::string, ExplorationPolicy> explorationPolicy{
         "inverse_proportional", ExploreInverseProportional{}};
-    bool noop{false};
 
     bool help{false};
     bool debug{false};

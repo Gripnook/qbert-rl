@@ -8,14 +8,10 @@ SubsumptionAgent2::SubsumptionAgent2(
     StateEncoding encodeBlockState,
     StateEncoding encodeEnemyState,
     SubsumptionSupression suppress,
-    ExplorationPolicy explore,
-    bool allowNoop)
+    ExplorationPolicy explore)
     : Agent{ale},
-      blockSolver{name + "-block-solver", encodeBlockState, explore, allowNoop},
-      enemyAvoider{name + "-enemy-avoider",
-                   encodeEnemyState,
-                   explore,
-                   allowNoop},
+      blockSolver{name + "-block-solver", encodeBlockState, explore},
+      enemyAvoider{name + "-enemy-avoider", encodeEnemyState, explore},
       suppress{suppress}
 {
 }

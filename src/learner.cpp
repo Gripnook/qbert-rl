@@ -12,13 +12,11 @@ Learner::Learner(
     std::string name,
     StateEncoding encodeState,
     ExplorationPolicy explore,
-    bool allowNoop,
     float alpha,
     float gamma)
     : name{name},
       encodeState{encodeState},
       explore{explore},
-      allowNoop{allowNoop},
       alpha{alpha},
       gamma{gamma}
 {
@@ -122,8 +120,6 @@ std::vector<Action>
     Learner::getActions(std::pair<int, int> position, const StateType& state)
 {
     std::vector<Action> actions;
-    if (allowNoop)
-        actions.push_back(Action::PLAYER_A_NOOP);
     if (state.first[position.first - 1][position.second] != GameEntity::Void)
         actions.push_back(Action::PLAYER_A_UP);
     if (state.first[position.first][position.second + 1] != GameEntity::Void)

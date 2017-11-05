@@ -54,10 +54,6 @@ Args parseArgs(int argc, char** argv)
             args.explorationPolicy =
                 parseExplorationPolicy(argv[i], i, argc, argv);
         }
-        else if (arg == "-n" || arg == "--noop")
-        {
-            args.noop = true;
-        }
         else if (arg == "-h" || arg == "--help")
         {
             args.help = true;
@@ -190,10 +186,6 @@ void printUsage(const char* progname)
         << std::endl;
     std::cerr << "        Defaults to " << args.explorationPolicy.first << "."
               << std::endl;
-    std::cerr << std::endl;
-    std::cerr << "    -n" << std::endl;
-    std::cerr << "    --noop" << std::endl;
-    std::cerr << "        Enables no-op actions." << std::endl;
     std::cerr << std::endl;
     std::cerr << "    -h" << std::endl;
     std::cerr << "    --help" << std::endl;

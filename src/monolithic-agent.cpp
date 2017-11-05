@@ -6,9 +6,8 @@ MonolithicAgent::MonolithicAgent(
     ALEInterface& ale,
     const std::string& name,
     StateEncoding encodeState,
-    ExplorationPolicy explore,
-    bool allowNoop)
-    : Agent{ale}, learner{name + "-learner", encodeState, explore, allowNoop}
+    ExplorationPolicy explore)
+    : Agent{ale}, learner{name + "-learner", encodeState, explore}
 {
 }
 
