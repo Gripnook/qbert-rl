@@ -166,7 +166,7 @@ float Learner::getRandomFraction()
 
 void Learner::loadFromFile()
 {
-    std::ifstream is{name + ".param"};
+    std::ifstream is{"params/" + name + ".param"};
     if (!is)
         return;
     int size;
@@ -194,7 +194,7 @@ void Learner::loadFromFile()
 
 void Learner::saveToFile()
 {
-    std::ofstream os{name + ".param.temp"};
+    std::ofstream os{"params/" + name + ".param.temp"};
     os << utilities.size() << std::endl;
     for (const auto& p : utilities)
     {
@@ -216,6 +216,8 @@ void Learner::saveToFile()
 
 void Learner::commitFile()
 {
-    rename((name + ".param.temp").c_str(), (name + ".param").c_str());
+    rename(
+        ("params/" + name + ".param.temp").c_str(),
+        ("params/" + name + ".param").c_str());
 }
 }
