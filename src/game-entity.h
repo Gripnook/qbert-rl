@@ -11,9 +11,10 @@ enum class GameEntity
     None,
     Qbert,
     Coily,
-    PurpleEnemy,
-    RedEnemy,
-    GreenEnemy,
+    PurpleBall,
+    Sam,
+    GreenBall,
+    RedBall,
     Disc
 };
 

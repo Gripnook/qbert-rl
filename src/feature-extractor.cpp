@@ -191,11 +191,18 @@ std::pair<std::vector<GameEntity>, std::vector<Color>>
         else if (isQbert(maxColor))
             entities.push_back(GameEntity::Qbert);
         else if (isPurpleEnemy(maxColor))
-            entities.push_back(GameEntity::PurpleEnemy);
+            entities.push_back(GameEntity::PurpleBall); // We add a purple ball
+                                                        // for now, and we will
+                                                        // correct with Coily's
+                                                        // position in RAM
+                                                        // later.
+        else if (
+            isGreenEnemy(maxColor) && counts[maxColor] > 80 / (xScale * yScale))
+            entities.push_back(GameEntity::Sam);
         else if (isGreenEnemy(maxColor))
-            entities.push_back(GameEntity::GreenEnemy);
+            entities.push_back(GameEntity::GreenBall);
         else
-            entities.push_back(GameEntity::RedEnemy);
+            entities.push_back(GameEntity::RedBall);
     }
 
     // Extracts the block colors.

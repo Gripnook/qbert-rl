@@ -529,15 +529,16 @@ bool checkDangerousBalls(const StateType& state, int x, int y)
 {
     if (x < 0 || x >= 8 || y < 0 || y >= 8)
         return false;
-    return state.first[x][y] == GameEntity::PurpleEnemy ||
-        state.first[x][y] == GameEntity::RedEnemy;
+    return state.first[x][y] == GameEntity::PurpleBall ||
+        state.first[x][y] == GameEntity::RedBall;
 }
 
 bool checkGreenEnemy(const StateType& state, int x, int y)
 {
     if (x < 0 || x >= 8 || y < 0 || y >= 8)
         return false;
-    return state.first[x][y] == GameEntity::GreenEnemy;
+    return state.first[x][y] == GameEntity::Sam ||
+        state.first[x][y] == GameEntity::GreenBall;
 }
 
 bool checkDisc(const StateType& state, int x, int y)
