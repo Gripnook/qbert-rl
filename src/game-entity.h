@@ -4,7 +4,7 @@
 
 namespace Qbert {
 
-// An enum representing entities in the game of Q*bert.
+// An enum representing entities in the game of Qbert.
 enum class GameEntity
 {
     Void,
