@@ -1,0 +1,158 @@
+P  {
+	color : #000000;
+	font-family:verdana;
+	font-size:12px;
+	line-height: 17px
+}
+
+tt {
+    font-family: monospace; 
+    font-size: 16px
+}
+
+blockquote {
+	line-height: 150%;
+	color: #111111;
+	margin-left: 25px;
+	margin-right: 25px;
+}
+.emailin {
+	background-color: #F4F4F4;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	border: 1px solid #D8D8D8;
+           }
+.emailout {
+	background-color: #D4D4F4;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-top: 1px;
+	padding-bottom: 1px;
+	border: 1px solid #D8D8D8;
+}
+.quotation {
+    background-color: #f4f4f4;
+    padding:10 30 2px;
+}
+.footnote {
+	font-size:10px;
+	font-style: italic;
+}
+
+OL, UL {
+	margin-left : 18px;
+	font-family:verdana;
+	font-size:12px
+}
+
+TD  {
+	color : #000000;
+	font-family:verdana;
+	font-size:12px;
+	line-height: 15px
+}
+
+TH  {
+	color : #000000;
+	font-family:verdana;
+	font-size:12px;
+	line-height: 15px;
+}
+
+LI  {
+	color : #232030;
+	font-family:verdana;
+	font-size:12px;
+	line-height: 20px;
+}
+
+
+H1  {
+	color : #602020;
+	font-family:verdana;
+	font-size:18px;
+	line-height: 20px
+}
+
+H2  {
+	color : #220022;
+	font-family:verdana;
+	font-size:15px;
+	line-height: 13px
+}
+
+H3  {
+	color : #000000;
+	font-family:verdana;
+	font-size:12px;
+	line-height: 12px
+}
+
+H4  {
+	color : #000000;
+	font-family:verdana;
+	font-size:11px;
+	line-height: 11px
+}
+
+tiny {
+	color : #000000;
+	font-family:verdana;
+	font-size:8px;
+	line-height: 8px
+}
+
+A  {}
+
+A:link  {
+	color : #0000ff;
+	text-decoration: none
+}
+
+A:visited  {
+	color : #0000ff;
+	text-decoration: none
+}
+
+A:active  {
+	color : #660033;
+	text-decoration: none
+}
+
+A:Hover  {
+	color : #FF0000;
+}
+
+BODY  {
+	margin-left : 15px;
+	margin-right : 20px;
+	font-size : 12px;
+	font-family : verdana;
+}
+
+.cell  {
+	font-size : 10px;
+	font-family : verdana;
+	line-height : 20px;
+}
+
+addr    {
+	font-family: verdana, arial;
+	color: #802000;
+	font-size: 8pt;
+}
+
+addr_me { 
+	  font-family: verdana, arial;
+          background: #88b; 
+          color: white; 
+          padding: 1px; 
+          line-height:1.1em; 
+  	font-size: 8pt;
+}
+
+.comment {background: #88b; color: white; padding: 7px; line-height:
+1.4em; }
+.optional {margin-left : 20px; color: #802020; font-size: 8pt}

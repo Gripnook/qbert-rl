@@ -1,0 +1,267 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+
+<style>
+td, th {
+    border: 1px solid black; text-align:left;
+}
+table {
+    border-collapse: collapse;
+}
+</style>
+
+<title>Assignment #3</title>
+<!--  ------------------------------------------------------------ -->
+
+        <link rel="stylesheet" type="text/css" href="Assignment%20%233_files/style01.css">
+
+<!--  ------------------------------------------------------------ -->
+</head><body bgcolor="#ffffff"> 
+
+<h1> Assignment #3: Reinforcement Learning </h1>
+<h3> Due: November 7 by 12:05 am</h3>
+
+
+<p>
+This assignment is to be done <b>individually</b>.
+
+</p><p>
+<img src="Assignment%20%233_files/h_line.gif">
+
+
+</p><h2>Academic Integrity</h2>
+
+<p>
+<i>
+The following is offered with apologies to the vast majority of
+students who do their work honestly and take their university learning
+seriously:
+</i>
+
+</p><p>
+Your instructor takes academic integrity seriously and has no
+tolerance for plagiarism or any other form of academic misconduct.
+Failure to respect these guidelines will result in you receiving a
+grade of <b>zero</b> on this assignment.
+
+</p><p>
+Acceptable collaboration between students, provided it is acknowledged explicitly in your report and code, might include:
+
+</p><ol>
+<li> discussing some aspect of the assignment specifications in attempting to understand a particular point
+</li><li> discussing one of the functions of the Arcade Learning Environment
+</li><li> discussing a problem you encountered while extracting the game score
+</li></ol>
+
+Sharing of any computer code between groups, or re-using any code from a third party (e.g., open source) is acceptable, <b>provided that you indicate this explicitly at the start of your report and (as comments) in the source code</b>.  In this case, only the portion of work that you did <b>as an individual group</b> will be considered toward your grade. 
+
+<p>
+<b>Unacceptable collaboration</b> and violations of academic integrity include, but are not limited to:
+
+</p><ol>
+<li> including any code that was not your own and failing to indicate so
+</li><li> copying part of another group's report
+</li></ol>
+
+If you are uncertain about any of these guidelines, please discuss with your instructor as soon as possible.
+
+<p>
+<img src="Assignment%20%233_files/h_line.gif">
+
+</p><h2>Introduction</h2>
+
+<p>
+In this assignment, you will apply reinforcement learning to improve the performance of an AI agent playing the game of <em>qbert</em> within the Atari emulator, <a href="https://stella-emu.github.io/" target="_blank">Stella</a>.  The <a href="https://github.com/mgbellemare/Arcade-Learning-Environment" target="_blank">Arcade Learning Environment</a>,
+ despite its limited external documentation, will likely prove 
+invaluable for accessing various elements of the game state.  The <em>qbert</em> binary is available <a href="http://www.cim.mcgill.ca/~jer/courses/ai/assignments/qbert.bin">here</a>.
+</p>
+
+<p>
+  Some tips to get started:
+</p>
+
+<ul>
+  <li>Read the quick start provided in the <a href="https://github.com/mgbellemare/Arcade-Learning-Environment/blob/master/README.md">ALE README</a>.</li>
+  <li>There is a short tutorial for the <a href="https://github.com/bbitmaster/ale_python_interface/wiki/Code-Tutorial">Python Interface</a>. </li>
+  <li>Read Chapter 2.2 and 4 of the <a href="https://github.com/mgbellemare/Arcade-Learning-Environment/blob/master/doc/manual/manual.pdf">ALE manual</a> regarding installation</li>
+  <li>if <span style="font-family: monospace;">pip install</span> fails, try with  <span style="font-family: monospace;">install</span></li>
+  <li>if you try the "random agent" example Python file from Chapter 4 of the <a href="https://github.com/mgbellemare/Arcade-Learning-Environment/blob/master/doc/manual/manual.pdf">ALE manual</a>, note that the apostrophe characters need to be replaced</li>
+  <li>run your sample agent with <span style="font-family: monospace;">python example.py qbert.bin</span></li>
+  <li>you may also want to install pygame; <span style="font-family: monospace;">sudo apt-get install python-pygame</span> for the sdl display (although your mileage may vary)</li>
+</ul>
+
+<p>
+As potentially useful background reading, you may wish to consult 
+previous research that investigated temporal difference learning methods
+ in such game environments, two examples of which are:</p>
+
+<ul>
+<li> <a href="http://www.aarondefazio.com/adefazio-rl2014.pdf">A Comparison of Learning Algorithms on the Arcade Learning Environment</a></li>
+<li> <a href="http://arxiv.org/pdf/1312.5602.pdf">Playing Atari with Deep Reinforcement Learning</a></li>
+</ul>
+
+<p>
+It should be emphasized, however, that you are not expected to carry out
+ the same degree of development and experimentation as described in such
+ publications.  These are only recommended for possible inspiration, as 
+they go well beyond the scope of these assignment specifications.
+</p>
+
+
+<h2> Submitting your assignment</h2>
+
+<p>Your assignment must be submitted through <a href="http://moodle.cim.mcgill.ca/">moodle</a> to allow for peer- and self-assessment.  The submission must contain:
+</p>
+
+<ul>
+  <li> a softcopy of your report</li>
+  
+  <li>
+    all of the source code ready to be compiled or interpreted on the
+    Trottier Engineering Linux machines
+  </li>
+
+  <li>
+    a Makefile as relevant 
+  </li>
+</ul>
+
+<p></p><h2> Marking Scheme </h2>
+
+<p>(Subject to minor revision)</p>
+
+
+<!--
+<table>
+<tbody><tr><td valign="middle"> <b><font color="#000080">Component</font></b><font color="#000080"></font></td>
+<td valign="middle"> <b><font color="#000080">Weight</font></b><font color="#000080"></font></td>
+</tr>
+
+<tr><th colspan=2> Generalization between similar states</th></tr>
+<tr><td> Description of approach</td><td>10</td></tr>
+<tr><td> Annotated experimental results demonstrating effects of generalization</td><td>10</td></tr>
+
+<tr><th colspan=2> Exploration Function</th></tr>
+<tr><td> Description of approach to supporting exploration</td><td>10</td></tr>
+<tr><td> Annotated experimental  results demonstrating progress of exploration over time</td><td>10</td></tr>
+
+<tr><th colspan=2> Agent Performance</th></tr>
+<tr><td> Annotated results demonstrating RL progress in agent performance over time</td><td>20</td></tr>
+<tr><td> Functional agent, capable of interacting with game environment</td><td>10</td></tr>
+<tr><td> Ranked placement of agent in class tournament</td><td>10</td></tr>
+
+<tr><th colspan=2> Code</th></tr>
+<tr><td> Relevant commenting and readability</td><td>10</td></tr>
+<tr><td> Ease of identifying necessary changes to code to support minor modification to specifications </td><td>10</td></tr>
+</tbody></table>
+-->
+
+	  <table cellspacing="0" cellpadding="3">
+
+	    <tbody><tr align="left">
+	      <th>Criterion</th><th>Unsatisfactory</th><th>Bare minimum</th><th>Satisfactory</th><th>Good</th><th>Above and beyond</th>
+	    </tr>
+
+	    <tr>
+	      <td>Description of approach to generalization</td>
+	      <td>0. none or incomprehensible</td>
+	      <td>5. provides overview of function approximation (if following 
+Sec. 21.4) or expression for distance metric between two states (if 
+following Mahadevan's approach)</td>
+	      <td>7. provides description of function approximation parameters 
+(Sec. 21.4)  or expression for distance metric between two states and 
+describes state representation used by the RL agent (Mahadevan)</td>
+	      <td>10. describes the degree to which function approximation 
+specializes to characterize good state-action pairs (Sec 21.4), or 
+provides an expression for distance metric between two states and 
+describes state representation used by the RL agent, also includes 
+rationale for choice of components of the distance metric (Mahadevan)</td>
+	    </tr>
+
+	    <tr>
+	      <td>Results of generalization</td>
+	      <td>0. no results provided</td>
+	      <td>5. graph or table showing improvement either in training time
+ to reach some level of performance, or performance achieved after a 
+fixed number of cycles vs. results without generalization</td>
+	      <td>7. results provided for at least 2 different generalization 
+approaches (i.e., choice of components of the distance metric) and some 
+discussion regarding consequences to behaviour of game agent</td>
+	      <td>10. results provided for at least 3 different generalization 
+approaches (i.e., choice of components of the distance metric) and 
+meaningful discussion regarding consequences to behaviour of game agent</td>
+	    </tr>
+
+	    <tr>
+	      <td>Description of approach to exploration</td>
+	      <td>0. none or incomprehensible</td>
+	      <td>5. provides expression for optimistic prior for (state, action) pairs</td>
+	      <td>7. provides expression for optimistic prior for (state, 
+action) pairs with clear explanation of how agent chose action at each 
+step</td>
+	      <td>10 provides expression for optimistic prior for (state, 
+action) pairs with clear explanation of how agent chose action at each 
+step and convincing rationale for the approach taken</td>
+	    </tr>
+
+	    <tr>
+	      <td>Results of exploration</td>
+	      <td>0. no results provided</td>
+	      <td>5. graph or table showing improvement either in training time
+ to reach some level of performance, or performance achieved after a 
+fixed number of cycles vs. results without exploration</td>
+	      <td>7. results provided for at least 2 different exploration 
+functions (i.e., weighting or N[s,a] in optimistic prior calculation) 
+and some discussion regarding consequences to behaviour of game agent</td>
+	      <td>10. results provided for at least 2 different exploration 
+functions (i.e., weighting or N[s,a] in optimistic prior calculation) 
+and meaningful discussion regarding consequences to behaviour of game 
+agent</td>
+	    </tr>
+
+	    <tr>
+	      <td>Agent Performance</td>
+	      <td>0. agent not demonstrated at competition; no results provided</td>
+	      <td>10. agent was able to run during competition, but no results provided</td>
+	      <td>15. graph or table showing agent performance, but 
+inadequately annotated or explained to provide clear understanding of 
+effects of learning</td>
+	      <td>20. graph or table showing agent performance, either as a 
+function of game score or game time (before death of game agent) as a 
+function of RL time (e.g., number of games played) </td>
+	      <td>30. as above, including analysis of effects of game events on
+ agent behaviour and strategies (e.g., "enemy" avoidance) AND 
+explanation of results over trials with multiple seeds to demonstrate 
+generalization of learning </td>
+	    </tr>
+
+	    <tr>
+	      <td>Relevant commenting and readability</td>
+	      <td>0. no README, minimal or no commenting of code</td>
+	      <td>5. README provided describing how to run agent, and code 
+contains basic commenting identifying how state representation is formed</td>
+	      <td>&nbsp;</td>
+	      <td>10. as above, README explains how to modify seed, and other major blocks of code are clearly commented</td>
+	    </tr>
+	    
+	    <tr>
+	      <td>Ranked placement of agent in class tournament</td>
+	      <td>0. (didn't play) </td>
+	      <td>3. </td>
+	      <td>5. </td>
+	      <td>7. </td>
+	      <td>10. </td>
+	  </tr></tbody></table>
+
+
+<p>
+<img src="Assignment%20%233_files/h_line.gif">
+</p>
+
+<p>
+<i>
+Last updated on 6 November 2017
+</i>
+
+</p>
+</body></html>
