@@ -42,7 +42,7 @@ void Learner::update(
         auto q = utilities[lastState][actionIndex];
         auto actions = getActions(position, state);
         auto qMax = utilities[currentState][actionToIndex(*std::max_element(
-            actions.begin(), actions.end(), [&](auto lhs, auto rhs) {
+            actions.begin(), actions.end(), [&](Action lhs, Action rhs) {
                 return utilities[currentState][actionToIndex(lhs)] <
                     utilities[currentState][actionToIndex(rhs)];
             }))];
@@ -79,7 +79,7 @@ Action Learner::getAction(
     auto actions = getActions(position, state);
 
     int minVisited = visited[currentState][actionToIndex(*std::min_element(
-        actions.begin(), actions.end(), [&](auto lhs, auto rhs) {
+        actions.begin(), actions.end(), [&](Action lhs, Action rhs) {
             return visited[currentState][actionToIndex(lhs)] <
                 visited[currentState][actionToIndex(rhs)];
         }))];
@@ -95,7 +95,7 @@ Action Learner::getAction(
     else
     {
         auto qMax = utilities[currentState][actionToIndex(*std::max_element(
-            actions.begin(), actions.end(), [&](auto lhs, auto rhs) {
+            actions.begin(), actions.end(), [&](Action lhs, Action rhs) {
                 return utilities[currentState][actionToIndex(lhs)] <
                     utilities[currentState][actionToIndex(rhs)];
             }))];
